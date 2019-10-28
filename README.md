@@ -1,8 +1,3 @@
-# BlackJack
-BlackJack multiplayer game
-
-# Setup project (FIRST THING TO DO)
-
 ### Clone project
 
 1. Go to whichever directory that you want to clone this project
