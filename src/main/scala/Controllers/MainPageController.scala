@@ -34,7 +34,7 @@ class MainPageController(
 	//Initialize graphic
 	//set Anchor Pane background Image
 	//set Game board Anchor Pane background Image
-	var myBackgroundImage= new BackgroundImage(new Image(getClass.getResourceAsStream("/Images/MainPageBackground.png")),
+	var myBackgroundImage= new BackgroundImage(new Image(getClass.getResourceAsStream("/Images/MainpageBackground.png")),
         BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
           new BackgroundSize(100, 100, true, true, true, true));
 
@@ -42,7 +42,6 @@ class MainPageController(
 	//set background image to anchorpane
 	mainVbox.setBackground(new Background(myBackgroundImage));
 
-	//background.setImage(new Image(getClass.getResourceAsStream("/Images/MainPageBackground.png")));
 	startGameButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/StartGame.png"))));
 	settingsButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/Settings.png"))));
 

@@ -24,11 +24,21 @@ object MainApp extends JFXApp {
   val roots = loader.getRoot[jfxs.layout.VBox]
   
   stage = new PrimaryStage {
-    title = "Client"
+    title = "BlackJack"
     scene = new Scene {
       root = roots
     }
   }
   stage.setResizable(false);
+
+
+  def goToRoomListPage() = {
+    val resource = getClass.getResource("/Views/RoomListPage.fxml")
+    val loader = new FXMLLoader(resource, NoDependencyResolver)
+    loader.load();
+    val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    
+    stage.getScene().setRoot(roots)
+  } 
 
 }
