@@ -29,6 +29,7 @@ class RoomListPageController(
 	//Initialize graphic
 	createRoomButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomListPage/createRoom.png"))));
 
+	
 
 
 
