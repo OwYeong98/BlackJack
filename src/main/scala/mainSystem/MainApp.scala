@@ -27,25 +27,41 @@ object MainApp extends JFXApp {
       root = roots
     }
   }
-  stage.setResizable(false);
-  goToRoomDetailPage()
+  stage.setResizable(false)
+  //goToRoomDetailPage(false)
+  //goToRoomListPage()
 
+  def goToMainPage() = {
+    val resource = getClass.getResource("/Views/MainPage.fxml")
+    val loader = new FXMLLoader(resource, NoDependencyResolver)
+    loader.load();
+    val roots = loader.getRoot[jfxs.layout.VBox]
+    val scene = new Scene(roots)
+    
+    stage.setScene(scene)
+  } 
+  
   def goToRoomListPage() = {
     val resource = getClass.getResource("/Views/RoomListPage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    val scene = new Scene(roots)
     
-    stage.getScene().setRoot(roots)
+    stage.setScene(scene)
   } 
 
-  def goToRoomDetailPage() = {
+  def goToRoomDetailPage(isHost:Boolean) = {
     val resource = getClass.getResource("/Views/RoomDetailPage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    var controller = loader.getController[RoomDetailPageController#Controller]
+    controller.setIsHost(isHost)
+
+    val scene = new Scene(roots)
     
-    stage.getScene().setRoot(roots)
+    stage.setScene(scene)
   } 
 
 }

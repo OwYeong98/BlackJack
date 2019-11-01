@@ -22,14 +22,23 @@ import scalafx.scene.image.Image
 class RoomListPageController(
 	val mainVbox: VBox,
 	val createRoomButton: Button, 
-
+	val joinButton: Button,
+	val backButton: Button
 	 )
 {	
 
 	//Initialize graphic
-	createRoomButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomListPage/createRoom.png"))));
+	createRoomButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomListPage/createRoom.png"))))
+	joinButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomListPage/join.png"))));
+	backButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomListPage/back.png"))));
 
-	
+	def backAction() = {
+		MainApp.goToMainPage()
+	}
+
+	def joinAction() = {
+		
+	}
 
 
 

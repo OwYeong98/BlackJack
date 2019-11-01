@@ -38,16 +38,11 @@ class RoomDetailPageController(
     //this variable indicite whether user is Host of the room
     var isHost: Boolean = true
 
-    var playerInRoomList:ListBuffer[PlayerDetailRowController#Controller] = ListBuffer[PlayerDetailRowController#Controller]()
-
-    addPlayerToList("Jack")
-    addPlayerToList("OwYeong")
-    addPlayerToList("Gilbert")
-    addPlayerToList("Erncheng")
-    
+    var playerInRoomList:ListBuffer[PlayerDetailRowController#Controller] = ListBuffer[PlayerDetailRowController#Controller]()  
     
 
 	def setIsHost(value:Boolean) = {
+        isHost = value
 		if(value == true){
 			actionButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomDetailPage/start.png"))))
 		}else{
@@ -94,7 +89,7 @@ class RoomDetailPageController(
 
     def removePlayerFromList(name: String){
         for(row <- playerInRoomList){
-            if(row.name.text.value == name){
+            if(row.name.text.value.toLowerCase() == name.toLowerCase()){
                 playerListVBoxContainer.getChildren().remove(row.dealerContainer)
                 playerInRoomList -= row
             }

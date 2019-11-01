@@ -46,7 +46,13 @@ class MainPageController(
 	settingsButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/Settings.png"))));
 
 
+	def startAction() = {
+		MainApp.goToRoomListPage()
+	}
 
+	def settingAction() = {
+
+	}
 
 
 	

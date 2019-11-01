@@ -6,12 +6,12 @@
 
 <VBox fx:id="mainVbox" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="458.0" prefWidth="767.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.MainPageController">
    <children>
-      <Button fx:id="startGameButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="59.0" prefWidth="255.0" style="-fx-background-color: none; -fx-cursor: hand;">
+      <Button fx:id="startGameButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#startAction" prefHeight="59.0" prefWidth="255.0" style="-fx-background-color: none; -fx-cursor: hand;">
          <VBox.margin>
             <Insets top="280.0" />
          </VBox.margin>
       </Button>
-      <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="59.0" prefWidth="255.0" style="-fx-background-color: none; -fx-cursor: hand;">
+      <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#settingAction" prefHeight="59.0" prefWidth="255.0" style="-fx-background-color: none; -fx-cursor: hand;">
          <VBox.margin>
             <Insets top="20.0" />
          </VBox.margin>
