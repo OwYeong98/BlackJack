@@ -49,7 +49,8 @@ class PlayerDetailRowController(
 	}
 
 	def kick()={
-		roomDetailControllerReference.removePlayerFromList(name.text.value)
+
+		roomDetailControllerReference.kicked(name.text.value)
 	}
 	
 

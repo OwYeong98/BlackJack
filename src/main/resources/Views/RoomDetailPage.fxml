@@ -9,15 +9,14 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="621.0" prefWidth="702.0" style="-fx-background-color: #005752;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.RoomDetailPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="621.0" prefWidth="702.0" style="-fx-background-color: #005752;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.RoomDetailPageController">
    <children>
       <Label layoutX="254.0" layoutY="6.0" text="ROOM NO:" textFill="WHITE">
          <font>
             <Font name="Rockwell Extra Bold" size="20.0" />
          </font>
       </Label>
-      <Label layoutX="381.0" layoutY="2.0" text="20" textFill="WHITE">
+      <Label fx:id="roomNoLabel" layoutX="381.0" layoutY="2.0" textFill="WHITE">
          <font>
             <Font name="Rockwell Extra Bold" size="25.0" />
          </font>
@@ -37,7 +36,7 @@
          <children>
             <ImageView fx:id="dealerIcon" fitHeight="110.0" fitWidth="114.0" layoutX="26.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
             <Line endX="-100.00001525878906" endY="123.60000610351562" layoutX="257.0" layoutY="1.0" startX="-100.0" />
-            <Label layoutX="188.0" layoutY="14.0" text="John Doe">
+            <Label fx:id="hostNameLabel" layoutX="188.0" layoutY="14.0" text="John Doe">
                <font>
                   <Font name="Segoe UI Black" size="36.0" />
                </font>
@@ -49,7 +48,9 @@
             </Label>
          </children>
       </AnchorPane>
-      <Button fx:id="actionButton" layoutX="296.0" layoutY="566.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="163.0" style="-fx-background-color: none; -fx-cursor: hand;" />
-      <Button fx:id="leaveRoomButton" layoutX="470.0" layoutY="564.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="217.0" style="-fx-background-color: none; -fx-cursor: hand;" />
+      <Button fx:id="readyButton" layoutX="296.0" layoutY="566.0" mnemonicParsing="false" onAction="#readyAction" prefHeight="43.0" prefWidth="163.0" style="-fx-background-color: none; -fx-cursor: hand;" />
+      <Button fx:id="unreadyButton" layoutX="296.0" layoutY="566.0" mnemonicParsing="false" onAction="#unreadyAction" prefHeight="43.0" prefWidth="163.0" style="-fx-background-color: none; -fx-cursor: hand;" />
+      <Button fx:id="startButton" layoutX="296.0" layoutY="566.0" mnemonicParsing="false" onAction="#startAction" prefHeight="43.0" prefWidth="163.0" style="-fx-background-color: none; -fx-cursor: hand;" />
+      <Button fx:id="leaveRoomButton" layoutX="470.0" layoutY="564.0" mnemonicParsing="false" onAction="#leaveRoomAction" prefHeight="47.0" prefWidth="217.0" style="-fx-background-color: none; -fx-cursor: hand;" />
    </children>
 </AnchorPane>
