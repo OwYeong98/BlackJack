@@ -28,8 +28,7 @@ object MainApp extends JFXApp {
     }
   }
   stage.setResizable(false)
-  //goToRoomDetailPage(false)
-  //goToRoomListPage()
+  goToGamePage(1,true,"John")
 
   def goToMainPage() = {
     val resource = getClass.getResource("/Views/MainPage.fxml")
@@ -51,13 +50,28 @@ object MainApp extends JFXApp {
     stage.setScene(scene)
   } 
 
-  def goToRoomDetailPage(isHost:Boolean) = {
+  def goToRoomDetailPage(roomNo:Int,isHost:Boolean, playerName: String) = {
     val resource = getClass.getResource("/Views/RoomDetailPage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[RoomDetailPageController#Controller]
     controller.setIsHost(isHost)
+    controller.initializeRoomDetail(roomNo)
+    controller.playerName = playerName
+
+    val scene = new Scene(roots)
+    
+    stage.setScene(scene)
+  } 
+
+   def goToGamePage(roomNo: Int, isHost: Boolean, playerName: String) = {
+    val resource = getClass.getResource("/Views/GamePage.fxml")
+    val loader = new FXMLLoader(resource, NoDependencyResolver)
+    loader.load();
+    val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    var controller = loader.getController[GamePageController#Controller]
+    controller.initializeData(roomNo,isHost,playerName)
 
     val scene = new Scene(roots)
     

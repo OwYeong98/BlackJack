@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.GamePageController">
+   <children>
+      <VBox fx:id="player0VBox" alignment="TOP_CENTER" layoutX="368.0" layoutY="393.0" prefHeight="130.0" prefWidth="77.0" visible="false">
+         <children>
+            <Label fx:id="player0Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player0CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="player1VBox" alignment="TOP_CENTER" layoutX="368.0" layoutY="89.0" prefHeight="130.0" prefWidth="77.0" visible="false">
+         <children>
+            <AnchorPane fx:id="player1CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+               <children>
+                  <ImageView fx:id="dealerCardHolderIcon" fitHeight="50.0" fitWidth="50.0" layoutX="8.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </AnchorPane>
+            <Label fx:id="player1Name" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <VBox fx:id="player2VBox" alignment="TOP_CENTER" layoutX="190.0" layoutY="244.0" prefHeight="130.0" prefWidth="77.0" rotate="90.0" visible="false">
+         <children>
+            <Label fx:id="player2Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player2CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="player3VBox" alignment="TOP_CENTER" layoutX="564.0" layoutY="238.0" prefHeight="130.0" prefWidth="77.0" rotate="270.0" visible="false">
+         <children>
+            <Label fx:id="player3Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player3CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="player4VBox" alignment="TOP_CENTER" layoutX="190.0" layoutY="68.0" prefHeight="130.0" prefWidth="77.0" rotate="90.0" visible="false">
+         <children>
+            <Label fx:id="player4Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player4CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="player5VBox" alignment="TOP_CENTER" layoutX="564.0" layoutY="68.0" prefHeight="130.0" prefWidth="77.0" rotate="270.0" visible="false">
+         <children>
+            <Label fx:id="player5Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player5CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="player6VBox" alignment="TOP_CENTER" layoutX="190.0" layoutY="418.0" prefHeight="130.0" prefWidth="77.0" rotate="90.0" visible="false">
+         <children>
+            <Label fx:id="player6Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player6CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="player7VBox" alignment="TOP_CENTER" layoutX="564.0" layoutY="418.0" prefHeight="130.0" prefWidth="77.0" rotate="270.0" visible="false">
+         <children>
+            <Label fx:id="player7Name" alignment="BOTTOM_CENTER" prefHeight="50.0" prefWidth="77.0" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+               <font>
+                  <Font name="Gill Sans MT" size="15.0" />
+               </font>
+            </Label>
+            <AnchorPane fx:id="player7CardHolder" prefHeight="82.0" prefWidth="57.0" style="-fx-border-width: 3px; -fx-border-color: white; -fx-border-radius: 10px;">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </AnchorPane>
+         </children>
+      </VBox>
+      <FlowPane fx:id="player0CardList" columnHalignment="CENTER" layoutX="254.0" layoutY="532.0" prefHeight="67.0" prefWidth="331.0" />
+      <HBox alignment="CENTER_LEFT" layoutY="614.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="837.0" style="-fx-background-color: #BAF4BA; -fx-border-color: black; -fx-border-width: 3px;">
+         <children>
+            <ImageView fx:id="userIcon" fitHeight="80.0" fitWidth="68.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </ImageView>
+            <Label fx:id="userNameLabel" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="259.0" text="John" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="Elephant" size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </Label>
+            <Line endX="-100.00007629394531" endY="-70.01835632324219" startX="-100.00027465820312" startY="13.2745361328125" strokeWidth="3.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Line>
+            <Button fx:id="drawCardButton" mnemonicParsing="false" onAction="#drawCardAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="passButton" mnemonicParsing="false" onAction="#passAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="forfietButton" mnemonicParsing="false" onAction="#forfietAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Button>
+            <Label fx:id="messageLabel">
+               <opaqueInsets>
+                  <Insets left="10.0" />
+               </opaqueInsets>
+               <font>
+                  <Font name="Rockwell Extra Bold" size="30.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+      <FlowPane fx:id="player1CardList" columnHalignment="CENTER" layoutX="242.0" layoutY="4.0" prefHeight="67.0" prefWidth="331.0" />
+      <FlowPane fx:id="player2CardList" columnHalignment="CENTER" layoutX="-19.0" layoutY="235.0" prefHeight="146.0" prefWidth="190.0" rotate="90.0" />
+      <FlowPane fx:id="player3CardList" columnHalignment="CENTER" layoutX="654.0" layoutY="223.0" prefHeight="146.0" prefWidth="195.0" rotate="-90.0" />
+      <FlowPane fx:id="player4CardList" columnHalignment="CENTER" layoutX="-12.0" layoutY="39.0" prefHeight="146.0" prefWidth="177.0" rotate="90.0" />
+      <FlowPane fx:id="player6CardList" columnHalignment="CENTER" layoutX="-15.0" layoutY="420.0" prefHeight="146.0" prefWidth="182.0" rotate="90.0" />
+      <FlowPane fx:id="player5CardList" columnHalignment="CENTER" layoutX="657.0" layoutY="24.0" prefHeight="146.0" prefWidth="190.0" rotate="-90.0" />
+      <FlowPane fx:id="player7CardList" columnHalignment="CENTER" layoutX="657.0" layoutY="424.0" prefHeight="146.0" prefWidth="190.0" rotate="-90.0" />
+   </children>
+</AnchorPane>
