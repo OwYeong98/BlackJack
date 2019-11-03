@@ -88,7 +88,7 @@ class RoomListPageController(
 
 
 			//chg to room detail page
-			MainApp.goToRoomDetailPage(1,false,userName)
+			MainApp.goToRoomDetailPage(1,true,userName)
 		}
 	}
 
