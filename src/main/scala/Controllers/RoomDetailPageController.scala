@@ -74,6 +74,7 @@ class RoomDetailPageController(
     //this function will be called when player press start button
     def startAction() = {
 
+        MainApp.goToGamePage(roomId,true,playerName)
     }
 
     //this function will be called when player press ready button
@@ -155,6 +156,7 @@ class RoomDetailPageController(
         playerListVBoxContainer.getChildren().add(newPlayerDetail)
     }
 
+    //call this function to remove player from list providing the playername
     def removePlayerFromList(name: String)={
         for(row <- playerInRoomList){
             if(row.name.text.value.toLowerCase() == name.toLowerCase()){
@@ -164,6 +166,7 @@ class RoomDetailPageController(
         }
     }
 
+    //call this function to set player to ready  providing the playername
     def setPlayerStatusToReady(name: String) = {
         for(row <- playerInRoomList){
             if(row.name.text.value.toLowerCase() == name.toLowerCase()){
@@ -173,6 +176,7 @@ class RoomDetailPageController(
 
     }
 
+    //call this function to set player to not ready  providing the playername
      def setPlayerStatusToNotReady(name: String) = {
          for(row <- playerInRoomList){
             if(row.name.text.value.toLowerCase() == name.toLowerCase()){
