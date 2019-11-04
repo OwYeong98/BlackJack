@@ -92,6 +92,7 @@ class RoomListPageController(
 		}
 	}
 
+	//this function will be called when join button clicked
 	def joinAction() = {
 		val selectedIndex = roomTable.selectionModel().selectedIndex.value
 

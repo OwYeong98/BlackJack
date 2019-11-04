@@ -79,15 +79,14 @@ object MainApp extends JFXApp {
     
     stage.setScene(scene)
   } 
-  /*
 
-  def showItemEditDialog(item: Item,addoredit: String): Boolean = {
+  def showSettingDialog() = {
 
-    val resource = getClass.getResource("/Views/Inventory/Itemeditdialog.fxml")
+    val resource = getClass.getResource("/Views/settingPage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots2  = loader.getRoot[jfxs.Parent]
-    val control = loader.getController[ItemeditdialogController#Controller]
+    val control = loader.getController[settingPageController#Controller]
 
     val dialog = new Stage() {
       initModality(Modality.APPLICATION_MODAL)
@@ -97,13 +96,8 @@ object MainApp extends JFXApp {
       }
     }
     control.dialogStage = dialog
-    control.addoredit = addoredit
-    control.IteminDialog = item
-    control.initializeitemdata()
     dialog.showAndWait()
-
-    control.okClicked
   } 
-  */
+  
 
 }
