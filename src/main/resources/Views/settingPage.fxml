@@ -6,21 +6,20 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="192.0" prefWidth="289.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="192.0" prefWidth="289.0" style="-fx-background-color: #005752;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.settingPageController">
    <children>
-      <Label layoutX="14.0" layoutY="36.0" text="IP Address:">
+      <Label layoutX="14.0" layoutY="36.0" text="IP Address:" textFill="WHITE">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Label layoutX="14.0" text="Settings">
+      <Label layoutX="14.0" text="Settings" textFill="WHITE">
          <font>
             <Font name="Bodoni MT Black" size="28.0" />
          </font>
       </Label>
-      <TextField layoutX="13.0" layoutY="71.0" prefHeight="25.0" prefWidth="268.0" />
-      <Button layoutX="126.0" layoutY="140.0" mnemonicParsing="false" text="Ok" />
-      <Button layoutX="211.0" layoutY="140.0" mnemonicParsing="false" text="cancel" />
+      <TextField fx:id="ipAddressTextField" layoutX="13.0" layoutY="71.0" prefHeight="25.0" prefWidth="268.0" />
+      <Button layoutX="145.0" layoutY="140.0" mnemonicParsing="false" onAction="#okAction" text="Ok" />
+      <Button layoutX="211.0" layoutY="140.0" mnemonicParsing="false" onAction="#cancelAction" text="cancel" />
    </children>
 </AnchorPane>

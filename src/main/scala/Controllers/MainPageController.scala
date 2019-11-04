@@ -51,7 +51,7 @@ class MainPageController(
 	}
 
 	def settingAction() = {
-
+		MainApp.showSettingDialog()
 	}
 
 

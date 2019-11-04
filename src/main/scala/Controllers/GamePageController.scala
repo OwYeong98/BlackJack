@@ -165,7 +165,7 @@ class GamePageController(
 	}
 
 	def drawCardAction() = {
-		
+		animation_getCard("Q_club")
 	}
 	
 	def passAction() = {
@@ -281,7 +281,7 @@ class GamePageController(
 	       						animation_sendCardWithReveal(playerLists(index),playerCards(playerLists(index))(0),false)       						
 	       					}
 	       				});
-	       				Thread.sleep(1000)
+	       				Thread.sleep(500)
        				}
        			}
 
@@ -296,7 +296,7 @@ class GamePageController(
        							}	
 	       					}
 	       				});
-	       				Thread.sleep(1000)
+	       				Thread.sleep(500)
 	       			}
        				
        				
@@ -752,16 +752,16 @@ class GamePageController(
 			cardfront.scaleX=0
 			mainAnchorPane.getChildren().addAll(cardfront);
 
-			var hideBack:ScaleTransition = new ScaleTransition(new Duration(500), cardback)
+			var hideBack:ScaleTransition = new ScaleTransition(new Duration(100), cardback)
 			hideBack.setFromX(1)
 			hideBack.setToX(0)
-			var showFront:ScaleTransition = new ScaleTransition(new Duration(500), cardfront)
+			var showFront:ScaleTransition = new ScaleTransition(new Duration(100), cardfront)
 			showFront.setFromX(0)
 			showFront.setToX(1)
-			var showBack:ScaleTransition = new ScaleTransition(new Duration(500), cardback)
+			var showBack:ScaleTransition = new ScaleTransition(new Duration(100), cardback)
 			showBack.setFromX(0)
 			showBack.setToX(1)
-			var hideFront:ScaleTransition = new ScaleTransition(new Duration(500), cardfront)
+			var hideFront:ScaleTransition = new ScaleTransition(new Duration(100), cardfront)
 			hideFront.setFromX(1)
 			hideFront.setToX(0)
 
@@ -779,7 +779,7 @@ class GamePageController(
 			}
 
 			showFront.onFinished = (event: ActionEvent) =>  {
-				if(playedTime < 2){
+				if(playedTime < 1){
 					hideFront.play();
 					playedTime+=1
 				}else{
