@@ -5,8 +5,8 @@
 3. Enter the following line: `git clone https://github.com/ernchenghoo/BlackJack.git`
 
 ### Project details
-1.Java SE 8 (IMPORTANT)
-2.SBT 1.3.3
+JAVA SE 8 (IMPORTANT)
+SBT 1.3.3
 
 # GitHub general commands
 
