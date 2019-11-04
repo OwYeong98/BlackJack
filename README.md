@@ -4,10 +4,6 @@
 2. Right click and open git bash
 3. Enter the following line: `git clone https://github.com/ernchenghoo/BlackJack.git`
 
-### Project details
-JAVA SE 8 (IMPORTANT)
-SBT 1.3.3
-
 # GitHub general commands
 
 ### Pushing changes to remote branch
