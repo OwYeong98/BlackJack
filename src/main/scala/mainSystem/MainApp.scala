@@ -15,6 +15,8 @@ import java.net.{ServerSocket, Socket, InetAddress}
 
 
 object MainApp extends JFXApp {
+
+  var ipAddress:String = ""
  
   val rootResource = getClass.getResource("/Views/MainPage.fxml")
   val loader = new FXMLLoader(rootResource, NoDependencyResolver)
@@ -28,7 +30,7 @@ object MainApp extends JFXApp {
     }
   }
   stage.setResizable(false)
-  goToGamePage(1,true,"John")
+
 
   def goToMainPage() = {
     val resource = getClass.getResource("/Views/MainPage.fxml")
@@ -77,5 +79,25 @@ object MainApp extends JFXApp {
     
     stage.setScene(scene)
   } 
+
+  def showSettingDialog() = {
+
+    val resource = getClass.getResource("/Views/settingPage.fxml")
+    val loader = new FXMLLoader(resource, NoDependencyResolver)
+    loader.load();
+    val roots2  = loader.getRoot[jfxs.Parent]
+    val control = loader.getController[settingPageController#Controller]
+
+    val dialog = new Stage() {
+      initModality(Modality.APPLICATION_MODAL)
+      initOwner(stage)
+      scene = new Scene {
+        root = roots2
+      }
+    }
+    control.dialogStage = dialog
+    dialog.showAndWait()
+  } 
+  
 
 }

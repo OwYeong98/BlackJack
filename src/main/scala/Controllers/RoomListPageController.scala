@@ -88,10 +88,11 @@ class RoomListPageController(
 
 
 			//chg to room detail page
-			MainApp.goToRoomDetailPage(1,false,userName)
+			MainApp.goToRoomDetailPage(1,true,userName)
 		}
 	}
 
+	//this function will be called when join button clicked
 	def joinAction() = {
 		val selectedIndex = roomTable.selectionModel().selectedIndex.value
 
