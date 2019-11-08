@@ -18,6 +18,9 @@ object BlackJack extends App {
   deck.makeDeck()
   //Can shuffle multiple times for more randomness?
   deck.shuffle()
+  deck.shuffle()
+  deck.shuffle()
+  deck.shuffle()
 
   //Distributing the cards to the players
   for (c <- 0 to 1){
@@ -145,10 +148,11 @@ object BlackJack extends App {
         (p.find(_.playerName==w(0)).get).handCard.map((hc: Tuple2[String,Integer]) => {print(s"${hc}")})
       }
       case c if (w.size >= 2) => {
-        println(s"Game resulted in a draw between ${w.map((f: String) => {
+        print("Game resulted in a draw between")
+        w.map((f: String) => {
           print(s" || $f ||")
         })
-        }")
+        println()
       }
       case _ => println("Something wrong?")
     }
