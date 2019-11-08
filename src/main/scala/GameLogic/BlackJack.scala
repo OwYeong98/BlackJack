@@ -16,6 +16,7 @@ object BlackJack extends App {
   //Making the Deck
   val deck = new Deck()
   deck.makeDeck()
+  //Can shuffle multiple times for more randomness?
   deck.shuffle()
 
   //Distributing the cards to the players
