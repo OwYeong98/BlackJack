@@ -131,9 +131,21 @@ object BlackJack extends App {
     var winner = ArrayBuffer[String]()
     var bestScore = 0
     players.map((p: Player) => {
-      if(p.getHandWorth() > bestScore){
-        bestScore = p.getHandWorth()
-        winner.append(p.playerName)
+      if(bestScore == 0){
+        if(p.getHandWorth() > bestScore){
+          bestScore = p.getHandWorth()
+          winner.insert(0, p.playerName)
+        }
+      }
+      else{
+        if(p.getHandWorth() > bestScore){
+          bestScore = p.getHandWorth()
+          winner.clear()
+          winner.insert(0, p.playerName)
+        }
+        else if(p.getHandWorth() == bestScore){
+          winner.append(p.playerName)
+        }
       }
     })
     winner
