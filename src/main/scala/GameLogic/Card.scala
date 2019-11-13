@@ -2,18 +2,18 @@ package GameLogic
 
 import scala.collection.mutable
 
-object Card{
+object Card {
   val symbol = List("Diamond","Club","Love","Spade")
-  val digit = List(1,2,3,4,5,6,7,8,9,10,10,10,10)
-  //val symbolx = mutable.Stack[Tuple2[String,Integer]]
+  val value = List(1,2,3,4,5,6,7,8,9,10,10,10,10)
+  val digit = List("A","2","3","4","5","6","7","8","9","10","J","Q","K")
 
-  def makeCard(): mutable.Stack[Tuple2[String,Integer]]= {
-    var temp = mutable.Stack[Tuple2[String,Integer]]()
+  def makeCard(): mutable.Stack[Tuple3[String,Integer,String]]= {
+    var temp = mutable.Stack[Tuple3[String,Integer,String]]()
       for (s <- symbol) {
         //println(s)
-        for (d <- digit) {
+        for (c <- 0 to 12) {
           //println(d)
-          temp.push(Tuple2(s,d))
+          temp.push(Tuple3(s,value(c),digit(c)))
       }
     }
     //println(s"$temp")

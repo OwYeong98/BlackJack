@@ -4,7 +4,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 class Deck {
-  var deck = mutable.Stack[Tuple2[String,Integer]]()
+  var deck = mutable.Stack[Tuple3[String,Integer,String]]()
 
   def makeDeck() = {
     deck = Card.makeCard()
@@ -20,3 +20,4 @@ class Deck {
   }
 
 }
+

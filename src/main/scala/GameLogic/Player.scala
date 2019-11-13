@@ -3,12 +3,12 @@ package GameLogic
 import scala.collection.mutable.ArrayBuffer
 
 class Player (pname: String){
-  var handCard = ArrayBuffer[Tuple2[String,Integer]]()
+  var handCard = ArrayBuffer[Tuple3[String,Integer,String]]()
   var handValue = None: Option[Integer]
   var playerName = pname
   var handWorth = None: Option[Integer]
 
-  def assignHandCard(card: Tuple2[String,Integer])= {
+  def assignHandCard(card: Tuple3[String,Integer,String])= {
     handCard.append(card)
   }
 

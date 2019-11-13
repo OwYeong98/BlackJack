@@ -43,6 +43,7 @@ object BlackJack extends App {
   })
 
   winner = determineWinner()
+  println(s"winner list contains $winner")
 
   declareWinner(winner, players)
 
@@ -50,7 +51,7 @@ object BlackJack extends App {
     case None => println("Game resulted in a draw")
     case _ => {
       println(s"${winner.get} has won the game with a total hand value of ${(players.find(_.playerName==winner.get).get).getHandValue()}")
-      (players.find(_.playerName==winner.get).get).handCard.map((hc: Tuple2[String,Integer]) => {print(s"${hc}")})
+      (players.find(_.playerName==winner.get).get).handCard.map((hc: Tuple3[String,Integer]) => {print(s"${hc}")})
     }
   }*/
 
@@ -75,7 +76,7 @@ object BlackJack extends App {
   //Display player's cards
   def displayHand(p: Player) = {
     println(s"${p.playerName} your hand value is ")
-    p.handCard.map((hc: Tuple2[String,Integer]) => {print(s"${hc}")})
+    p.handCard.map((hc: Tuple3[String,Integer,String]) => {print(s"${hc}")})
     println()
   }
 
@@ -83,7 +84,7 @@ object BlackJack extends App {
   def checkValue(p: Player) = {
     var haveAce = checkAce(p.handCard)
     var value = 0
-    p.handCard.map((c: Tuple2[String,Integer]) => {
+    p.handCard.map((c: Tuple3[String,Integer,String]) => {
       value += c._2
     })
     if(haveAce){
@@ -116,9 +117,10 @@ object BlackJack extends App {
   }
 
   //Check the existence of Ace
-  def checkAce(playerCard: ArrayBuffer[Tuple2[String,Integer]]): Boolean = {
+  def checkAce(playerCard: ArrayBuffer[Tuple3[String,Integer,String]]): Boolean = {
     var haveAce = false
-    playerCard.map((c: Tuple2[String,Integer]) => {
+    var numAce = 0
+    playerCard.map((c: Tuple3[String,Integer,String]) => {
       if ( c._2 == 1 ){
         haveAce = true
       }
@@ -157,7 +159,7 @@ object BlackJack extends App {
       case a if (w.size <= 0) => println("Game resulted in a draw")
       case b if (w.size < 2) => {
         println(s"${w(0)} has won the game with a total hand value of ${(p.find(_.playerName==w(0)).get).getHandValue()}")
-        (p.find(_.playerName==w(0)).get).handCard.map((hc: Tuple2[String,Integer]) => {print(s"${hc}")})
+        (p.find(_.playerName==w(0)).get).handCard.map((hc: Tuple3[String,Integer,String]) => {print(s"${hc}")})
       }
       case c if (w.size >= 2) => {
         print("Game resulted in a draw between")
