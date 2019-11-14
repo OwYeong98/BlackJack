@@ -24,7 +24,7 @@ import javafx.{scene => jfxs}
 @sfxml
 class RoomDetailPageController(
 	val playerListVBoxContainer: VBox,
-    val dealerIcon: ImageView,
+    val hostIcon: ImageView,
 	val dealerContainer: AnchorPane,
     val readyButton: Button,
     val unreadyButton: Button,
@@ -35,7 +35,7 @@ class RoomDetailPageController(
 	 )
 {	
     //initialize graphic
-    dealerIcon.image = new Image(getClass.getResourceAsStream("/Images/RoomDetailPage/dealer.png"))
+    hostIcon.image = new Image(getClass.getResourceAsStream("/Images/RoomDetailPage/host.png"))
     leaveRoomButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomDetailPage/leaveroom.png"))))
     readyButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomDetailPage/ready.png"))))
     unreadyButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/RoomDetailPage/unready.png"))))
@@ -58,6 +58,9 @@ class RoomDetailPageController(
         //save this roodId as class variable so we can access it anywhere in the class
         this.roomId = roomId
 
+
+        /**********Maybe can ask server for detail here*******************************/
+        //and use the sample below to update detail
         //initialize room detail
         //***sample***
         print(roomId)
@@ -74,7 +77,7 @@ class RoomDetailPageController(
     //this function will be called when player press start button
     def startAction() = {
 
-        MainApp.goToGamePage(roomId,true,playerName)
+        MainApp.goToGamePage(roomId,playerName)
     }
 
     //this function will be called when player press ready button
@@ -131,6 +134,9 @@ class RoomDetailPageController(
             
 		}
 	}
+    def setHostName(name:String) = {
+        hostNameLabel.text = name
+    }
 
     def addPlayerToList(name: String)={
         //load the player detail row fxml template
@@ -183,6 +189,15 @@ class RoomDetailPageController(
                 row.setNotReady()
             }
         }        
+    }
+
+    def youHaveBeenKicked() = {
+        val alert = new Alert(AlertType.Error){
+			        initOwner(MainApp.stage)
+			        title       = "Kicked"
+			        headerText  = "Kicked By Host"
+			        contentText = "Opps! You have been kicked by host."
+			      }.showAndWait()	
     }
     /*******************************************************************************************************/
 
