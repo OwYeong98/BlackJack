@@ -15,6 +15,9 @@ import java.net.{ServerSocket, Socket, InetAddress}
 
 
 object MainApp extends JFXApp {
+  var roomListPageControllerRef:RoomListPageController#Controller = null
+  var roomDetailPageControllerRef:RoomDetailPageController#Controller = null
+  var gamePageControllerRef:GamePageController#Controller = null
 
   var ipAddress:String = ""
  
@@ -47,6 +50,8 @@ object MainApp extends JFXApp {
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    var controller = loader.getController[RoomListPageController#Controller]
+    roomListPageControllerRef = controller
     val scene = new Scene(roots)
     
     stage.setScene(scene)
@@ -58,6 +63,7 @@ object MainApp extends JFXApp {
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[RoomDetailPageController#Controller]
+    roomDetailPageControllerRef = controller
     controller.setIsHost(isHost)
     controller.initializeRoomDetail(roomNo)
     controller.playerName = playerName
@@ -67,13 +73,14 @@ object MainApp extends JFXApp {
     stage.setScene(scene)
   } 
 
-   def goToGamePage(roomNo: Int, isHost: Boolean, playerName: String) = {
+   def goToGamePage(roomNo: Int, playerName: String) = {
     val resource = getClass.getResource("/Views/GamePage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[GamePageController#Controller]
-    controller.initializeData(roomNo,isHost,playerName)
+    gamePageControllerRef = controller
+    controller.initializeData(roomNo,playerName)
 
     val scene = new Scene(roots)
     
