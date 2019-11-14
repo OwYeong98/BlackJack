@@ -137,6 +137,7 @@ class GamePageController(
 		
 	}
 
+	//leave it first not sure if u guys want let user to forfiet the game if he got 16 or 17 point
 	def forfietAction() = {
 		
 	}

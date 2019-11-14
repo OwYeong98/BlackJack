@@ -53,6 +53,11 @@ class RoomListPageController(
 	def initializeData() = {
 		//initialize list of room available in the server
 
+		//maybe ask server for room list available here
+		// and also server can keep track of akka actor and provide update as needed
+
+		
+
 		//***sample***
 		addNewRoomOrUpdate(1,"John",5)
 		addNewRoomOrUpdate(2,"Jack",4)
