@@ -57,6 +57,7 @@ class RoomDetailPageController(
     def initializeRoomDetail(roomId: Int) = {
         //save this roodId as class variable so we can access it anywhere in the class
         this.roomId = roomId
+        roomNoLabel.text = roomId.toString()
 
 
         /**********Maybe can ask server for detail here*******************************/
@@ -64,8 +65,8 @@ class RoomDetailPageController(
         //initialize room detail
         //***sample***
         print(roomId)
-        roomNoLabel.text = roomId.toString()
-        hostNameLabel.text = "John Doe"
+        
+        setHostName("John Doe")
 
         //get player in room from server and add to list
         addPlayerToList("Jack")
