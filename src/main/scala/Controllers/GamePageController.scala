@@ -121,6 +121,8 @@ class GamePageController(
 		//set userIcon
 		userIcon.image = new Image(getClass.getResourceAsStream("/Images/GamePage/player.png"))
 		setUserName(playerName)
+
+		//maybe ask server for initialize the player here...
 		
 
 		gameLogic()
