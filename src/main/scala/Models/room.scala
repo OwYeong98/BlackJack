@@ -2,7 +2,7 @@ package Models
 
 import scalafx.beans.property.{StringProperty, IntegerProperty, ObjectProperty}
 
-class room(private var _roomNo: Int, private var _hostName: String,private var _noOfPlayer: Int){
+class Room(private var _roomNo: Int, private var _hostName: String,private var _noOfPlayer: Int){
 
 	
 	//property are for table use

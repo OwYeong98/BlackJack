@@ -10,6 +10,11 @@ import javafx.{scene => jfxs}
 import scalafx.stage.{Modality, Stage}
 import java.net.{ServerSocket, Socket, InetAddress}
 
+import ds._
+import java.net.NetworkInterface
+import akka.actor.{ActorSystem, Props}
+import com.typesafe.config.ConfigFactory
+import scala.collection.JavaConverters._
 
 
 
@@ -20,7 +25,58 @@ object MainApp extends JFXApp {
   var gamePageControllerRef:GamePageController#Controller = null
 
   var ipAddress:String = ""
- 
+  var port:Int = -1
+  
+  /*********Ask for what port to bind*******/
+  var count = -1
+  val addresses = (for (inf <- NetworkInterface.getNetworkInterfaces.asScala;
+                        add <- inf.getInetAddresses.asScala) yield {
+    count = count + 1
+    (count -> add)
+  }).toMap
+  for((i, add) <- addresses){
+    println(s"$i = $add")
+  }
+  println("please select which interface to bind")
+  var selection: Int = 0
+  do {
+    selection = scala.io.StdIn.readInt()
+  } while(!(selection >= 0 && selection < addresses.size))
+
+  val ipaddress = addresses(selection)
+
+  val overrideConf = ConfigFactory.parseString(
+    s"""
+       |akka {
+       |  loglevel = "INFO"
+       |
+ |  actor {
+       |    provider = "akka.remote.RemoteActorRefProvider"
+       |  }
+       |
+ |  remote {
+       |    enabled-transports = ["akka.remote.netty.tcp"]
+       |    netty.tcp {
+       |      hostname = "${ipaddress.getHostAddress}"
+       |      port = 0
+       |    }
+       |
+ |    log-sent-messages = on
+       |    log-received-messages = on
+       |  }
+       |
+ |}
+       |
+     """.stripMargin)
+  val myConf = overrideConf.withFallback(ConfigFactory.load())
+  val system = ActorSystem("blackjack", myConf)
+  val roomListServerRef = system.actorOf(Props[ds.server.roomListServerActor](), "roomlistserver")
+  
+
+
+
+
+  /***Show Stage UI***/
   val rootResource = getClass.getResource("/Views/MainPage.fxml")
   val loader = new FXMLLoader(rootResource, NoDependencyResolver)
   loader.load();
@@ -33,6 +89,7 @@ object MainApp extends JFXApp {
     }
   }
   stage.setResizable(false)
+   /******************/
 
 
   def goToMainPage() = {
