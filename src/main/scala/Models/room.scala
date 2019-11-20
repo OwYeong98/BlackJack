@@ -2,7 +2,7 @@ package Models
 
 import scalafx.beans.property.{StringProperty, IntegerProperty, ObjectProperty}
 
-class Room(private var _roomNo: Int, private var _hostName: String,private var _noOfPlayer: Int){
+class Room(private var _roomNo: Int, private var _hostName: String,private var _noOfPlayer: Int) {
 
 	
 	//property are for table use
@@ -19,15 +19,15 @@ class Room(private var _roomNo: Int, private var _hostName: String,private var _
 	//setter
 	def roomNo_=(newValue: Int){
 		_roomNo=newValue
-		roomNoProperty = ObjectProperty[Int](newValue)
+		roomNoProperty.value = newValue
 	}
 	def hostName_=(newValue: String){
 		_hostName=newValue
-		hostNameProperty =  new StringProperty(newValue)
+		hostNameProperty.value =  newValue
 	}
 	def noOfPlayer_=(newValue: Int){
 		_noOfPlayer=newValue
-		noOfPlayerProperty = new StringProperty(newValue+" / 7")
+		noOfPlayerProperty.value = newValue+" / 7"
 	}
 
 

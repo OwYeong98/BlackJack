@@ -21,6 +21,7 @@ import scalafx.scene.image.ImageView
 import scalafx.scene.image.Image
 
 import akka.actor.{Actor, ActorRef,Props}
+import ds.client.RoomListClientActor
 
 
 
@@ -61,15 +62,12 @@ class RoomListPageController(
 		// and also server can keep track of akka actor and provide update as needed
 
 		//this actor will responsible for all function of this page including instruction from server
-		roomListClientRef = MainApp.system.actorOf(Props[ds.client.roomListClientActor](), "client")
+		roomListClientRef = MainApp.system.actorOf(Props[ds.client.RoomListClientActor](), "client")
 		
 		//get room list will update the roomlist to UI and subscribe for receiving update from server
 		roomListClientRef ! "getRoomList"
 
-
-		//***sample***
 		
-
 	}
 
 	//this function will be called when the createRoom button is clicked
@@ -88,19 +86,11 @@ class RoomListPageController(
 			
 		} else{
 			//create room in server
-			
+			roomListClientRef ! RoomListClientActor.CreateRoom(userName)
+
+			//page changing will be handle in the roomListClientRef Actor
 
 
-
-
-
-
-
-
-
-
-			//chg to room detail page
-			MainApp.goToRoomDetailPage(1,true,userName)
 		}
 	}
 
@@ -121,14 +111,10 @@ class RoomListPageController(
 			      }.showAndWait()	
 			} else{
 				//join room in server
-				
+				roomListClientRef ! RoomListClientActor.Join(selectedRoom.roomNo,userName)
 
+				//page changing will be handle in the roomListClientRef Actor
 
-
-
-
-				//chg to room detail page
-				MainApp.goToRoomDetailPage(selectedRoom.roomNo,false,userName)
 			}
 			
 		} else{
@@ -140,6 +126,11 @@ class RoomListPageController(
 		        contentText = "Please select a Room in the table."
 		      }.showAndWait()
 		}
+	}
+
+	def backAction() = {
+		MainApp.system.stop(roomListClientRef)
+		MainApp.goToMainPage()
 	}
 
 
@@ -191,7 +182,5 @@ class RoomListPageController(
 
 
 	
-	def backAction() = {
-		MainApp.goToMainPage()
-	}
+	
 }

@@ -20,6 +20,8 @@ import scalafx.scene.image.Image
 import scalafxml.core.{NoDependencyResolver, FXMLView, FXMLLoader}
 import javafx.{scene => jfxs}
 
+import akka.actor.{Actor, ActorRef,Props}
+
 
 @sfxml
 class RoomDetailPageController(
@@ -50,16 +52,19 @@ class RoomDetailPageController(
     //List for string player in the room
     var playerInRoomList:ListBuffer[PlayerDetailRowController#Controller] = ListBuffer[PlayerDetailRowController#Controller]()  
 
+    //Actor Ref Client
+    var roomPageClientRef: ActorRef = null
 
     /**********************Function For Network**********************************************/
 
     //this function will be called when the page load
-    def initializeRoomDetail(roomId: Int) = {
+    def initializeRoomDetail(roomId: Int, hostActorRef:ActorRef) = {
         //save this roodId as class variable so we can access it anywhere in the class
         this.roomId = roomId
         roomNoLabel.text = roomId.toString()
 
-
+        roomPageClientRef = MainApp.system.actorOf(Props(new ds.client.RoomPageClientActor(hostActorRef)), "roompageclient")
+        
         /**********Maybe can ask server for detail here*******************************/
         //and use the sample below to update detail
         //initialize room detail
@@ -199,6 +204,8 @@ class RoomDetailPageController(
 			        headerText  = "Kicked By Host"
 			        contentText = "Opps! You have been kicked by host."
 			      }.showAndWait()	
+        MainApp.system.stop(roomPageClientRef)
+        MainApp.goToRoomListPage()
     }
     /*******************************************************************************************************/
 
