@@ -1,6 +1,7 @@
 package Controllers
 
 import MainSystem.MainApp
+import GameLogic._
 import scala.collection.mutable.ListBuffer
 
 import scalafxml.core.macros.sfxml
@@ -78,11 +79,9 @@ class GamePageController(
 	val drawCardButton: Button,
 	val passButton: Button,
 	val forfietButton: Button,
-	val dealerCardHolderIcon: ImageView,
 	val popUpTitle: Label,
 	val winTypeImageView:ImageView,
 	val leaveRoomButton:Button
-
 	 )
 {	
 
@@ -94,7 +93,6 @@ class GamePageController(
 
 	//set background image to anchorpane
 	mainAnchorPane.setBackground(new Background(myBackgroundImage));
-	dealerCardHolderIcon.image = new Image(getClass.getResourceAsStream("/Images/GamePage/dealer.png"))
 
 	drawCardButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/drawcard.png"))));
 	passButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/pass.png"))));
@@ -103,99 +101,107 @@ class GamePageController(
 
 	//this variable store the roomNo of this game
 	var roomNo: Int = 0
-	//this variable store whether the player is a dealer
-	var isDealer: Boolean = false
 	//this variable store the player name of this client
 	var playerName: String = null
 
+	// Player name list with ordered sequence
+	var playerTurnSequence:ArrayBuffer[String] = ArrayBuffer[String]() 
 	//this list store player name of all player
-	var playerLists:ListBuffer[String] = ListBuffer[String]() 
+	var playerLists:ArrayBuffer[String] = ArrayBuffer[String](null,null,null,null,null,null,null,null) 
 	
 
 
 	/**********************Function For Network**************************************************/
 
 	//this function will be called when this page run
-	def initializeData(roomNo:Int, isDealer: Boolean, playerName: String) = {
+	def initializeData(roomNo:Int, playerName: String) = {
 		this.roomNo = roomNo
-		this.isDealer = isDealer
 		this.playerName = playerName
 
 		//set userIcon
-		setIsDealer(isDealer)
+		userIcon.image = new Image(getClass.getResourceAsStream("/Images/GamePage/player.png"))
 		setUserName(playerName)
 
-		/******sample*******/
-		hideActionButtonAndShowMessage("Player 1 Turns!")
-		showActionButton(true)
+		//maybe ask server for initialize the player here...
+		
 
-		//intialize player to the list so that animation function can recognize the player name
-		//Note player 0 must be name of this client and player 1 must be the dealer
-
-		//player 0 which is the player name of this client
-		addPlayer("Eric")
-		//player 1 which is dealer name
-		addPlayer("John")
-		//player 2
-		addPlayer("Jack")
-		addPlayer("Kelvin")
-		
-		addPlayer("Jason")
-		addPlayer("Nick")
-		addPlayer("Jeff")
-		
-		//2D Map that store what card they get
-		val cards:Map[String,ArrayBuffer[String]] = Map("Eric" -> ArrayBuffer("K_club","Q_club"), 
-							                        "John" -> ArrayBuffer("A_diamond"), 
-							                        "Jack" -> ArrayBuffer("K_club"),
-													"Kelvin" -> ArrayBuffer("2_heart"), 
-													"Jason" -> ArrayBuffer("Q_diamond"), 
-													"Nick" -> ArrayBuffer("J_spade"), 
-													"Jeff" -> ArrayBuffer("3_diamond"), 
-													"Edwin" -> ArrayBuffer("6_heart"))
-        
-		initializeCard(cards)
-		
+		gameLogic()
 		/*************************/
-
-
-
-
-
 	}
 
 	def drawCardAction() = {
 		animation_getCard("Q_club")
+		//server 
 	}
 	
 	def passAction() = {
-
+		
+		
 	}
 
+	//leave it first not sure if u guys want let user to forfiet the game if he got 16 or 17 point
 	def forfietAction() = {
-		val result:Map[String,ArrayBuffer[String]] = Map("Eric" -> ArrayBuffer("win","blackjack"), 
-							                        "John" -> ArrayBuffer("win","amounthigh"), 
-							                        "Jack" -> ArrayBuffer("draw"),
-													"Kelvin" -> ArrayBuffer("win","opponentbust"), 
-													"Jason" -> ArrayBuffer("win","opponentbust"), 
-													"Nick" -> ArrayBuffer("win","blackjack"), 
-													"Jeff" -> ArrayBuffer("win","blackjack"), 
-													"Edwin" -> ArrayBuffer("win","blackjack"))
-
-		val cards:Map[String,ArrayBuffer[String]] = Map("Eric" -> ArrayBuffer("K_club","Q_club"), 
-							                        "John" -> ArrayBuffer("A_diamond","A_spade"), 
-							                        "Jack" -> ArrayBuffer("K_club","2_heart"),
-													"Kelvin" -> ArrayBuffer("2_heart","6_diamond"), 
-													"Jason" -> ArrayBuffer("Q_diamond","10_diamond"), 
-													"Nick" -> ArrayBuffer("J_spade","Q_spade"), 
-													"Jeff" -> ArrayBuffer("3_diamond","A_heart"), 
-													"Edwin" -> ArrayBuffer("6_heart","1_diamond"))
-		showResult(result,cards)
+		
 	}
 
 	def leaveRoomAction() ={
 		MainApp.goToMainPage()
 	}
+
+	var players = ArrayBuffer[Player]()
+	def gameLogic() = {
+		
+		var pname = ArrayBuffer("Player4","Player1","Player3","Player2","Player5","Player6")
+		var winner = ArrayBuffer[String]()
+
+		//Instantiating Players
+		pname.map((n: String) => {
+			players.append(new Player(n))
+		})
+		println(playerLists)
+		initializePlayer(pname)
+		println(playerLists)
+
+		 //Making the Deck
+		val deck = new Deck()
+		deck.makeDeck()
+		//Can shuffle multiple times for more randomness?
+		deck.shuffle()
+		deck.shuffle()
+		deck.shuffle()
+		deck.shuffle()
+
+		//Distributing the cards to the players
+		for (c <- 0 to 1){
+			players.map((p: Player) => {
+			p.assignHandCard(deck.draw())
+			})
+		}
+
+		val playerCards:Map[String,ArrayBuffer[Tuple3[String,Integer,String]]] = Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]()
+
+		for(player <- players){
+			//make map ("Player1"->CardList)
+			playerCards+=(player.playerName -> player.handCard)
+		}
+
+		//animation send card to each player
+		initializeCard(playerCards)
+		
+		/*
+		//get all player card
+		val finalPlayerCards:Map[String,ArrayBuffer[Tuple3[String,Integer,String]]] = Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]()
+
+		for(player <- players){
+			//make map ("Player1"->CardList)
+			finalPlayerCards+=(player.playerName -> player.handCard)
+		}
+		
+		//determine winner and show result
+		showResult(ArrayBuffer[String]("Player1","Player2"),finalPlayerCards)
+		*/
+	}
+
 	
 	/********************************************************************************************/
 
@@ -258,48 +264,117 @@ class GamePageController(
 	card 4 name = "4_heart","4_spade","4_club","4_diamond"
 	card 3 name = "3_heart","3_spade","3_club","3_diamond"
 	card 2 name = "2_heart","2_spade","2_club","2_diamond"
-	card 1 name = "1_heart","1_spade","1_club","1_diamond"
 	
 	*/
+	def changePlayer(playerNameTurn:String) = {
+		new Thread {
+		    override def run {
+				Platform.runLater(new Runnable() {
+   					override def run {
+						popUpTitle.text = playerNameTurn +" Turn!"
+   					}
+   				});
+				
+				Thread.sleep(500)
+				Platform.runLater(new Runnable() {
+   					override def run {
+						popUpTitle.text = ""
+   					}
+   				});
+		    }
+		}.start()
+		
+		//if it is this client turn show button
+		if(playerName == playerNameTurn){
+			showActionButton(false)
+		}else{
+			hideActionButtonAndShowMessage("It's "+playerNameTurn+" turn!")
+		}	
+	}
 
-	def initializeCard(playerCards:Map[String,ArrayBuffer[String]]) = {
+	def sendCard(name:String,card:String) = {
+		//if the player is self
+		if(playerName == name){
+			animation_sendCardWithReveal(name,card,false)
+		}else{
+			animation_sendHiddenCard(name)
+		}	
+	}
+
+	def initializePlayer(playerList: ArrayBuffer[String] ) = {
+		playerTurnSequence++=playerList
+		var clockwiseSequence = ListBuffer[Int]()
+		clockwiseSequence += (0,6,2,4,1,5,3,7)
+
+		//remove empty player in clockwise sequence
+		for(x <- clockwiseSequence){
+			if(x >= playerList.length ){
+				clockwiseSequence -= x
+			}
+		}
+
+		//playerList will show player in sequence which according to their turnn
+		//for example if playerList = ("Jack","Nick","John","Martin") and player of this client is John
+		//what i trying to do here is rearrage so that john will be the first
+		//after rearrange will be playerList = ("John","Martin","Jack","Nick")
+		
+		//println(playerList)
+		var beforePlayer = true
+		var splitedArray:(ArrayBuffer[String],ArrayBuffer[String]) = playerList.partition((s:String)=>{
+			if(s.toLowerCase == playerName.toLowerCase)
+				beforePlayer=false
+
+			beforePlayer
+		})
+		//splittedArray._1 will be player before this client which is ArrayBuffer("Jack","Nick")
+		//splittedArray._2 will be player after this client which is ArrayBuffer("John","Martin")
+		var rearrangedPlayerList = splitedArray._2++splitedArray._1
+
+		for(index <- 0 to rearrangedPlayerList.length-1){
+			playerLists.update(clockwiseSequence(index),rearrangedPlayerList(index))
+			playerNameLabelList(clockwiseSequence(index)).text = rearrangedPlayerList(index)
+			playerVBoxList(clockwiseSequence(index)).visible = true
+		}
+	}
+
+	def initializeCard(playerCards:Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]) = {
+
 
 		//use new Thread because cannot sleep current thread because it will hangs the User Interface
 		new Thread {
 		    override def run {
-		        //this sequence is clockwise
-				var cardSequence = ListBuffer[Int]()
-				cardSequence += (1,5,3,7,0,6,2,4)
-
 		        //must put platform runlater if modify User Interface object in non javafx Thread
-       			for(index <- cardSequence){
-       				//if index is small the the length then only its occurs
-       				if(index < playerLists.length){
-	       				Platform.runLater(new Runnable() {
-	       					override def run {
-	       						
-	       						animation_sendCardWithReveal(playerLists(index),playerCards(playerLists(index))(0),false)       						
-	       					}
-	       				});
-	       				Thread.sleep(500)
-       				}
+       			for(currPlayerName <- playerTurnSequence){
+					if(currPlayerName != null){
+						println(currPlayerName)
+						Platform.runLater(new Runnable() {
+							override def run {
+								var cardName:String = playerCards(currPlayerName)(0)._3 +"_"+playerCards(currPlayerName)(0)._1 
+
+								animation_sendCardWithReveal(currPlayerName,cardName,false)       						
+							}
+						});
+						Thread.sleep(500)
+					}
+       				
        			}
 
-       			for(index <- cardSequence){
-       				if(index < playerLists.length){
-	       				Platform.runLater(new Runnable() {
-	       					override def run {
-       							if(index == 0 ){
-       								animation_sendCardWithReveal(playerLists(index),playerCards(playerLists(index))(1),true)   
-       							}else{
-       								animation_sendHiddenCard(playerLists(index))
-       							}	
-	       					}
-	       				});
-	       				Thread.sleep(500)
-	       			}
-       				
-       				
+       			for(currPlayerName <- playerTurnSequence){
+					if(currPlayerName != null){
+						Platform.runLater(new Runnable() {
+							override def run {
+								var cardName:String = playerCards(currPlayerName)(1)._3 +"_"+playerCards(currPlayerName)(1)._1 
+
+								//if equal to this client reveal the card
+								if(currPlayerName == playerName ){
+									animation_sendCardWithReveal(currPlayerName,cardName,true)   
+								}else{
+									animation_sendHiddenCard(currPlayerName)
+								}	
+							}
+						});
+						Thread.sleep(500)
+					}	
        			}
 		    }
 		}.start()
@@ -308,143 +383,122 @@ class GamePageController(
 	var playerCardHolderList = new ListBuffer[AnchorPane]()
 	playerCardHolderList += (player0CardHolder,player1CardHolder,player2CardHolder,player3CardHolder,player4CardHolder,player5CardHolder,player6CardHolder,player7CardHolder)
 
-	def showResult(result: Map[String,ArrayBuffer[String]],playerCards:Map[String,ArrayBuffer[String]]) = {
+	def showResult(winnerList: ArrayBuffer[String],playerCardsTuple:Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]) = {
+		val result:Map[String,String] = Map()
+		for(playerName <- playerTurnSequence){
+			if(winnerList.contains(playerName)){
+				//if only 1 winner then win else draw
+				if(winnerList.length == 1){
+					result+=(playerName->"win")
+				}else{
+					result+=(playerName->"draw")
+				}
+			}else{
+				result+=(playerName->"lose")
+			}
+		}
+		var playerCards = Map[String,ArrayBuffer[String]]()
+		for((currPlayerName, cards) <- playerCardsTuple){
+			var cardStringList:ArrayBuffer[String] = ArrayBuffer[String]()
+			for(currCard <- cards ){
+				var cardName:String = currCard._3 +"_"+currCard._1 
+				cardStringList+=cardName
+			}
+			
+			playerCards+=(currPlayerName->cardStringList)
+		}
+		
+
 
 		//use new Thread because cannot sleep current thread because it will hangs the User Interface
 		new Thread {
-		    override def run {
-		        //this sequence is clockwise
-				var cardSequence = ListBuffer[Int]()
-				cardSequence += (5,3,7,0,6,2,4)
-
-				//make dealer card holder background lightblue
-				Platform.runLater(new Runnable() {
-   					override def run {
-						playerCardHolderList(1).style="-fx-border-width:3px;-fx-border-color:white;-fx-border-radius:10px;-fx-background-color: lightblue;"
-   					}
-   				});
+		    override def run {			
 				
-				//********************show card of the dealer**************
-				//remove the already revealed first card
-				playerCards(playerLists(1)) -= cardListFlowPanes(1).getChildren()(0).asInstanceOf[javafx.scene.image.ImageView].userData.asInstanceOf[String]
-				var currentCardIndex:Int = 1
-				for(card <- playerCards(playerLists(1))){
-					//if there are a hidden card replace the image
-					if( currentCardIndex < cardListFlowPanes(1).getChildren().length){
-						var hiddenCard:ImageView = cardListFlowPanes(1).getChildren()(currentCardIndex).asInstanceOf[javafx.scene.image.ImageView]
-						Platform.runLater(new Runnable() {
-		   					override def run {
-								hiddenCard.image = new Image(getClass.getResourceAsStream("/Images/GamePage/Card/"+card+".png"))
-		   					}
-		   				});
-						
-						Thread.sleep(300)	
-					}else{
-						var newhiddencard: ImageView = new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/Card/"+card+".png")))
 
-						Platform.runLater(new Runnable() {
-		   					override def run {
-								cardListFlowPanes(1).getChildren().addAll(newhiddencard)
-		   					}
-		   				});
+				for(name <- playerTurnSequence){
+					//make card holder background light blue
+					Platform.runLater(new Runnable() {
+						override def run {
+							playerCardHolderList(playerLists.indexOf(name)).style="-fx-border-width:3px;-fx-border-color:white;-fx-border-radius:10px;-fx-background-color: lightblue;"
+						}
+					});
+					Thread.sleep(300)
 
-						Thread.sleep(300)
+					//********************show card of the player**************
+					//remove the already revealed first card
+					println(playerCards(name))
+					playerCards(name) -= cardListFlowPanes(playerLists.indexOf(name)).getChildren()(0).asInstanceOf[javafx.scene.image.ImageView].userData.asInstanceOf[String]
+					println(playerCards(name))
+					var currentCardIndex:Int = 1
+					for(card <- playerCards(name)){
+						//if there are a hidden card replace the image
+						if( currentCardIndex < cardListFlowPanes(playerLists.indexOf(name)).getChildren().length){
+							var hiddenCard:ImageView = cardListFlowPanes(playerLists.indexOf(name)).getChildren()(currentCardIndex).asInstanceOf[javafx.scene.image.ImageView]
+							Platform.runLater(new Runnable() {
+								override def run {
+									hiddenCard.image = new Image(getClass.getResourceAsStream("/Images/GamePage/Card/"+card+".png"))
+									hiddenCard.opacity = 1
+								}
+							});
+
+							Thread.sleep(300)	
+						}else{
+							var newhiddencard: ImageView = new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/Card/"+card+".png")))
+							Platform.runLater(new Runnable() {
+								override def run {
+									cardListFlowPanes(playerLists.indexOf(name)).getChildren().addAll(newhiddencard)
+								}
+							});
+							Thread.sleep(300)
+						}
+						currentCardIndex+=1
 					}
-					currentCardIndex+=1
-				}
-				//************************************************
+					//************************************************
 
-				for(index <- cardSequence){
-					//if this player exist
-					if(index < playerLists.length){
-						//make card holder background light blue
+					//show win condition
+					if(result(name) == "win"){
 						Platform.runLater(new Runnable() {
-		   					override def run {
-								playerCardHolderList(index).style="-fx-border-width:3px;-fx-border-color:white;-fx-border-radius:10px;-fx-background-color: lightblue;"
-		   					}
-		   				});
-						Thread.sleep(300)
-
-						//********************show card of the player**************
-						//remove the already revealed first card
-						playerCards(playerLists(index)) -= cardListFlowPanes(index).getChildren()(0).asInstanceOf[javafx.scene.image.ImageView].userData.asInstanceOf[String]
-						var currentCardIndex:Int = 1
-						for(card <- playerCards(playerLists(index))){
-							//if there are a hidden card replace the image
-							if( currentCardIndex < cardListFlowPanes(index).getChildren().length){
-								var hiddenCard:ImageView = cardListFlowPanes(index).getChildren()(currentCardIndex).asInstanceOf[javafx.scene.image.ImageView]
-								Platform.runLater(new Runnable() {
-				   					override def run {
-										hiddenCard.image = new Image(getClass.getResourceAsStream("/Images/GamePage/Card/"+card+".png"))
-										hiddenCard.opacity = 1
-				   					}
-				   				});
-
-								Thread.sleep(300)	
-							}else{
-								var newhiddencard: ImageView = new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/Card/"+card+".png")))
-								Platform.runLater(new Runnable() {
-				   					override def run {
-										cardListFlowPanes(index).getChildren().addAll(newhiddencard)
-				   					}
-				   				});
-								Thread.sleep(300)
+							override def run {
+								showWinsLabel(name,"win")
 							}
-							currentCardIndex+=1
-						}
-						//************************************************
-
-						//show win condition
-						result(playerLists(index))(0) match {
-							case "win" =>
-								//player wins
-								Platform.runLater(new Runnable() {
-				   					override def run {
-										showWinsLabel(playerLists(index),result(playerLists(index))(1))
-				   					}
-				   				});
-								
-								Thread.sleep(1250)
-
-							case "lose" => 
-								//dealer wins
-								Platform.runLater(new Runnable() {
-				   					override def run {
-										showWinsLabel(playerLists(1),result(playerLists(index))(1))
-				   					}
-				   				});
-								
-								Thread.sleep(1250)
-
-							case "draw" => 
-								Platform.runLater(new Runnable() {
-				   					override def run {
-										showWinsLabel("","draw")
-				   					}
-				   				});
-								
-								Thread.sleep(1250)
-						}
-						//make card holder background none
-						playerCardHolderList(index).style="-fx-border-width:3px;-fx-border-color:white;-fx-border-radius:10px;-fx-background-color: none;"
-						var newLabel:Label = new Label(result(playerLists(index))(0))
-						newLabel.layoutX = 20
-						newLabel.layoutY = 20
-						newLabel.textFill = Color.web("#FFFFFF")
-
+						});
+						Thread.sleep(1250)
+					}else if(result(name) == "lose"){
 						Platform.runLater(new Runnable() {
-		   					override def run {
-								playerCardHolderList(index).getChildren.addAll(newLabel)
-		   					}
-		   				});
-						
-
-						Thread.sleep(100)
+							override def run {
+								showWinsLabel(name,"lose")
+							}
+						});
+						Thread.sleep(1250)
+					}else if(result(name) == "draw"){
+						Platform.runLater(new Runnable() {
+							override def run {
+								showWinsLabel(name,"draw")
+							}
+						});
+						Thread.sleep(1250)
 					}
+					
+					//make card holder background none
+					playerCardHolderList(playerLists.indexOf(name)).style="-fx-border-width:3px;-fx-border-color:white;-fx-border-radius:10px;-fx-background-color: none;"
+					var newLabel:Label = new Label(result(name))
+					newLabel.layoutX = 20
+					newLabel.layoutY = 20
+					newLabel.textFill = Color.web("#FFFFFF")
+
+					Platform.runLater(new Runnable() {
+						override def run {
+							playerCardHolderList(playerLists.indexOf(name)).getChildren.addAll(newLabel)
+						}
+					});
+					
+
+					Thread.sleep(100)
+					
 				}
 
 				//show whether you win or lose
-				result(playerLists(0))(0) match{
+				result(playerName) match{
 					case "win" =>
 						//player wins
 						Platform.runLater(new Runnable() {
@@ -505,12 +559,7 @@ class GamePageController(
 		numofPlayer+=1
 
 	}
-	def setIsDealer(isDealer: Boolean) = {
-		if(isDealer)
-			userIcon.image = new Image(getClass.getResourceAsStream("/Images/GamePage/dealer.png"))
-		else
-			userIcon.image = new Image(getClass.getResourceAsStream("/Images/GamePage/player.png"))
-	}
+
 
 	def setUserName(name: String) = {
 		userNameLabel.text = name
@@ -589,8 +638,10 @@ class GamePageController(
 	def animation_sendHiddenCard(playerName:String) = {
 		var playerIndex: Int = -1
 		for(index <- 0 to playerLists.length-1){
-			if(playerLists(index).toLowerCase() == playerName.toLowerCase()){
-				playerIndex = index
+			if(playerLists(index)!=null){
+				if(playerLists(index).toLowerCase() == playerName.toLowerCase()){
+					playerIndex = index
+				}
 			}
 		}
 
@@ -648,8 +699,10 @@ class GamePageController(
 
 		var playerIndex: Int = -1
 		for(index <- 0 to playerLists.length-1){
-			if(playerLists(index).toLowerCase() == playerName.toLowerCase()){
-				playerIndex = index
+			if(playerLists(index) != null){
+				if(playerLists(index).toLowerCase() == playerName.toLowerCase()){
+					playerIndex = index
+				}
 			}
 		}
 
@@ -833,18 +886,14 @@ class GamePageController(
 		popUpTitle.text = playername
 
 		winType match {
-			case "blackjack" =>  
-				winTypeImageView.image = new Image(getClass.getResourceAsStream("/Images/GamePage/blackjackwin.png"))
+			case "win" =>  
+				winTypeImageView.image = new Image(getClass.getResourceAsStream("/Images/GamePage/win.png"))
 				winTypeImageView.fitWidth = 479
 				winTypeImageView.fitHeight = 153
-			case "amounthigh" =>
-				winTypeImageView.image = new Image(getClass.getResourceAsStream("/Images/GamePage/amounthighwin.png"))
+			case "lose" =>
+				winTypeImageView.image = new Image(getClass.getResourceAsStream("/Images/GamePage/lose.png"))
 				winTypeImageView.fitWidth = 598
 				winTypeImageView.fitHeight = 153
-			case "opponentbust"=>
-				winTypeImageView.image = new Image(getClass.getResourceAsStream("/Images/GamePage/opponentbustwin.png"))
-				winTypeImageView.fitWidth = 673
-				winTypeImageView.fitHeight = 147
 			case "draw" =>
 				winTypeImageView.image = new Image(getClass.getResourceAsStream("/Images/GamePage/draw.png"))
 				winTypeImageView.fitWidth = 368

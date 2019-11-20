@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.scalameta</groupId>
+    <artifactId>sbt-metals</artifactId>
+    <packaging>jar</packaging>
+    <description>sbt-metals</description>
+    <url>https://github.com/scalameta/metals</url>
+    <version>0.7.6</version>
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <name>sbt-metals</name>
+    <organization>
+        <name>org.scalameta</name>
+        <url>https://github.com/scalameta/metals</url>
+    </organization>
+    <scm>
+        <url>https://github.com/scalameta/metals</url>
+        <connection>scm:git:https://github.com/scalameta/metals.git</connection>
+        <developerConnection>scm:git:git@github.com:scalameta/metals.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <id>laughedelic</id>
+            <name>Alexey Alekhin</name>
+            <email>laughedelic@gmail.com</email>
+            <url>https://github.com/laughedelic</url>
+        </developer>
+        <developer>
+            <id>gabro</id>
+            <name>Gabriele Petronella</name>
+            <email>gabriele@buildo.io</email>
+            <url>https://github.com/gabro</url>
+        </developer>
+        <developer>
+            <id>mudsam</id>
+            <name>Johan Mudsam</name>
+            <email>johan@mudsam.com</email>
+            <url>https://github.com/mudsam</url>
+        </developer>
+        <developer>
+            <id>jvican</id>
+            <name>Jorge Vicente Cantero</name>
+            <email>jorgevc@fastmail.es</email>
+            <url>https://jvican.github.io/</url>
+        </developer>
+        <developer>
+            <id>marek1840</id>
+            <name>Marek Żarnowski</name>
+            <email>mzarnowski@virtuslab.com</email>
+            <url>https://github.com/marek1840</url>
+        </developer>
+        <developer>
+            <id>olafurpg</id>
+            <name>Ólafur Páll Geirsson</name>
+            <email>olafurpg@gmail.com</email>
+            <url>https://geirsson.com</url>
+        </developer>
+        <developer>
+            <id>ShaneDelmore</id>
+            <name>Shane Delmore</name>
+            <email>sdelmore@twitter.com</email>
+            <url>http://delmore.io</url>
+        </developer>
+        <developer>
+            <id>tgodzik</id>
+            <name>Tomasz Godzik</name>
+            <email>tgodzik@virtuslab.com</email>
+            <url>https://github.com/tgodzik</url>
+        </developer>
+    </developers>
+    <properties>
+        <scalaVersion>2.12</scalaVersion>
+        <sbtVersion>1.0</sbtVersion>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.12.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-sbt</groupId>
+            <artifactId>sbt</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

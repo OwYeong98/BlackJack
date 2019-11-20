@@ -11,7 +11,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.GamePageController">
+<AnchorPane fx:id="mainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="704.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.GamePageController">
    <children>
       <VBox fx:id="player0VBox" alignment="TOP_CENTER" layoutX="368.0" layoutY="393.0" prefHeight="130.0" prefWidth="77.0" visible="false">
          <children>
@@ -33,9 +33,6 @@
                <VBox.margin>
                   <Insets left="10.0" right="10.0" />
                </VBox.margin>
-               <children>
-                  <ImageView fx:id="dealerCardHolderIcon" fitHeight="50.0" fitWidth="50.0" layoutX="8.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" />
-               </children>
             </AnchorPane>
             <Label fx:id="player1Name" textAlignment="CENTER" textFill="WHITE" wrapText="true">
                <font>
@@ -136,7 +133,7 @@
                   <Insets left="20.0" />
                </HBox.margin>
             </ImageView>
-            <Label fx:id="userNameLabel" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="259.0" text="John" textAlignment="CENTER" wrapText="true">
+            <Label fx:id="userNameLabel" alignment="CENTER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="259.0" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font name="Elephant" size="24.0" />
                </font>
@@ -149,17 +146,17 @@
                   <Insets left="10.0" />
                </HBox.margin>
             </Line>
-            <Button fx:id="drawCardButton" mnemonicParsing="false" onAction="#drawCardAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;">
+            <Button fx:id="drawCardButton" mnemonicParsing="false" onAction="#drawCardAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;" visible="false">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
             </Button>
-            <Button fx:id="passButton" mnemonicParsing="false" onAction="#passAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;">
+            <Button fx:id="passButton" mnemonicParsing="false" onAction="#passAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;" visible="false">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
             </Button>
-            <Button fx:id="forfietButton" mnemonicParsing="false" onAction="#forfietAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;">
+            <Button fx:id="forfietButton" mnemonicParsing="false" onAction="#forfietAction" prefHeight="36.0" prefWidth="127.0" style="-fx-background-color: none; -fx-cursor: hand;" visible="false">
                <HBox.margin>
                   <Insets left="10.0" />
                </HBox.margin>
