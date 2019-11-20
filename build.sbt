@@ -5,11 +5,19 @@ name := "myapp"
  scalaVersion := "2.12.3"
 
 
-// https://mvnrepository.com/artifact/org.scalafx/scalafx
-libraryDependencies += "org.scalafx" %% "scalafx" % "8.0.144-R12"
+libraryDependencies ++= Seq(
 
-// https://mvnrepository.com/artifact/org.scalafx/scalafxml-core-sfx8 
-libraryDependencies += "org.scalafx" %% "scalafxml-core-sfx8" % "0.4" 
+  "com.typesafe.akka" %% "akka-actor" % "2.5.26",  
+
+  "com.typesafe.akka" %% "akka-remote" % "2.5.26", 
+
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.26", 
+
+  "org.scalafx" %% "scalafx" % "8.0.181-R13", 
+
+  "org.scalafx" %% "scalafxml-core-sfx8" % "0.4" 
+
+)  
 
 // https://mvnrepository.com/artifact/mysql/mysql-connector-java
 libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.13"
