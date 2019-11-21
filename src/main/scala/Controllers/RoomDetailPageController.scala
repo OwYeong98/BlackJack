@@ -22,6 +22,9 @@ import javafx.{scene => jfxs}
 
 import akka.actor.{Actor, ActorRef,Props}
 
+import ds.client.RoomPageClientActor
+
+import java.util.UUID.randomUUID
 
 @sfxml
 class RoomDetailPageController(
@@ -63,32 +66,22 @@ class RoomDetailPageController(
         this.roomId = roomId
         roomNoLabel.text = roomId.toString()
 
-        roomPageClientRef = MainApp.system.actorOf(Props(new ds.client.RoomPageClientActor(hostActorRef)), "roompageclient")
+        roomPageClientRef = MainApp.system.actorOf(Props(new ds.client.RoomPageClientActor(hostActorRef)), "roompageclient-"+randomUUID().toString)
         
-        /**********Maybe can ask server for detail here*******************************/
-        //and use the sample below to update detail
-        //initialize room detail
-        //***sample***
-        print(roomId)
-        
-        setHostName("John Doe")
-
-        //get player in room from server and add to list
-        addPlayerToList("Jack")
-        addPlayerToList("Keith")
-        addPlayerToList("Jay")
-
+        //this call will ask server to initialze player detail
+        roomPageClientRef ! RoomPageClientActor.Join(playerName)
     }
 
     //this function will be called when player press start button
     def startAction() = {
+        roomPageClientRef ! RoomPageClientActor.Start()
 
-        MainApp.goToGamePage(roomId,playerName)
+        //MainApp.goToGamePage(roomId,playerName)
     }
 
     //this function will be called when player press ready button
     def readyAction() = {
-
+        roomPageClientRef ! RoomPageClientActor.Ready(playerName)
 
         //show unready button and hide unready
         readyButton.visible=false
@@ -97,8 +90,8 @@ class RoomDetailPageController(
 
     //this function will be called when player press unready button
     def unreadyAction() = {
-
-
+        roomPageClientRef ! RoomPageClientActor.NotReady(playerName)
+        
         //show ready button and hide unready
         readyButton.visible=true
         unreadyButton.visible=false
@@ -106,16 +99,16 @@ class RoomDetailPageController(
 
     //this function will be called when player press leaveroom button
     def leaveRoomAction() = {
+        roomPageClientRef ! RoomPageClientActor.LeaveRoom(playerName)
         MainApp.goToRoomListPage()
     }
 
     //this function will be called when host kick someone
     //nameOfPlayer store the name of the player who get kicked
     def kicked(nameOfPlayer: String){
+        roomPageClientRef ! RoomPageClientActor.Kick(nameOfPlayer)
 
-
-        //remove from list
-        removePlayerFromList(nameOfPlayer)
+        
     }
 
 
@@ -203,6 +196,17 @@ class RoomDetailPageController(
 			        title       = "Kicked"
 			        headerText  = "Kicked By Host"
 			        contentText = "Opps! You have been kicked by host."
+			      }.showAndWait()	
+        MainApp.system.stop(roomPageClientRef)
+        MainApp.goToRoomListPage()
+    }
+
+    def roomHadClosed() = {
+        val alert = new Alert(AlertType.Error){
+			        initOwner(MainApp.stage)
+			        title       = "Closed"
+			        headerText  = "Room has benn Closed!"
+			        contentText = "Host has Closed the Room!"
 			      }.showAndWait()	
         MainApp.system.stop(roomPageClientRef)
         MainApp.goToRoomListPage()

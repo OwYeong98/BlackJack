@@ -126,34 +126,44 @@ object MainApp extends JFXApp {
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[RoomDetailPageController#Controller]
+
+    roomListPageControllerRef = null
+    roomDetailPageControllerRef = controller
+    gamePageControllerRef = null
     controller.setIsHost(isHost)
-    controller.initializeRoomDetail(roomNo,hostActorRef)
     controller.playerName = playerName
+    controller.initializeRoomDetail(roomNo,hostActorRef)
+    
 
     val scene = new Scene(roots)
     
     stage.setScene(scene)
 
-    roomListPageControllerRef = null
-    roomDetailPageControllerRef = controller
-    gamePageControllerRef = null
+    
+
+    
+  
   } 
 
-   def goToGamePage(roomNo: Int, playerName: String) = {
+   def goToGamePage(playerName: String, clientActorRef:ActorRef) = {
     val resource = getClass.getResource("/Views/GamePage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[GamePageController#Controller]
-    controller.initializeData(roomNo,playerName)
+
+    roomListPageControllerRef = null
+    roomDetailPageControllerRef = null
+    gamePageControllerRef = controller
+
+
+    controller.initializeData(playerName,clientActorRef)
 
     val scene = new Scene(roots)
     
     stage.setScene(scene)
 
-    roomListPageControllerRef = null
-    roomDetailPageControllerRef = null
-    gamePageControllerRef = controller
+    
   } 
 
   def showSettingDialog() = {

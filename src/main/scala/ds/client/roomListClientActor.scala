@@ -24,6 +24,7 @@ import ds.client.RoomListClientActor.Join
 import ds.client.RoomListClientActor.CreateRoom
 import ds.server.RoomListServerActor
 
+import java.util.UUID.randomUUID
 
 class RoomListClientActor extends Actor {
   implicit val timeout = Timeout(10 second)
@@ -99,7 +100,7 @@ class RoomListClientActor extends Actor {
     case CreateRoom(name) =>
       for (server <- serverOpt){
         //since user create room he will be responsible as a server
-        val roomServer:ActorRef = MainApp.system.actorOf(Props(new ds.server.RoomPageServerActor(name)), "roompageserver")
+        val roomServer:ActorRef = MainApp.system.actorOf(Props(new ds.server.RoomPageServerActor(name)), "roompageserver"+randomUUID().toString)
         
         var result = server ? RoomListServerActor.CreateRoom(name,roomServer)
 

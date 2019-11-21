@@ -15,6 +15,7 @@ import scalafx.scene.layout.VBox
 import scalafx.scene.control.{Alert,TableColumn,TableView,TableCell}
 import scalafx.collections.ObservableBuffer
 import scalafx.beans.property.{StringProperty, ObjectProperty}
+import java.util.UUID.randomUUID
 
 import scalafx.scene.control.Button
 import scalafx.scene.image.ImageView
@@ -62,7 +63,7 @@ class RoomListPageController(
 		// and also server can keep track of akka actor and provide update as needed
 
 		//this actor will responsible for all function of this page including instruction from server
-		roomListClientRef = MainApp.system.actorOf(Props[ds.client.RoomListClientActor](), "client")
+		roomListClientRef = MainApp.system.actorOf(Props[ds.client.RoomListClientActor](), "client"+randomUUID().toString)
 		
 		//get room list will update the roomlist to UI and subscribe for receiving update from server
 		roomListClientRef ! "getRoomList"

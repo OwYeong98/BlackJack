@@ -38,6 +38,8 @@ import scala.collection.mutable.Map
 import scala.collection.mutable.ArrayBuffer
 import javafx.scene.paint.Color
 
+import akka.actor.{Actor, ActorRef,ActorSelection, Props}
+
 @sfxml
 class GamePageController(
 	val mainAnchorPane: AnchorPane,
@@ -99,8 +101,7 @@ class GamePageController(
 	forfietButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/forfiet.png"))));
 	leaveRoomButton.setGraphic(new ImageView(new Image(getClass.getResourceAsStream("/Images/GamePage/leaveroom.png"))));
 
-	//this variable store the roomNo of this game
-	var roomNo: Int = 0
+
 	//this variable store the player name of this client
 	var playerName: String = null
 
@@ -109,24 +110,23 @@ class GamePageController(
 	//this list store player name of all player
 	var playerLists:ArrayBuffer[String] = ArrayBuffer[String](null,null,null,null,null,null,null,null) 
 	
-
+	//this the the game page ActorRef
+	var gamePageClientActorRef: ActorRef = null
 
 	/**********************Function For Network**************************************************/
 
 	//this function will be called when this page run
-	def initializeData(roomNo:Int, playerName: String) = {
-		this.roomNo = roomNo
+	def initializeData( playerName: String,clientActorRef:ActorRef) = {
 		this.playerName = playerName
-
 		//set userIcon
 		userIcon.image = new Image(getClass.getResourceAsStream("/Images/GamePage/player.png"))
 		setUserName(playerName)
 
-		//maybe ask server for initialize the player here...
+
+		this.gamePageClientActorRef=clientActorRef
 		
 
-		gameLogic()
-		/*************************/
+		//maybe ask ser initialize player name
 	}
 
 	def drawCardAction() = {

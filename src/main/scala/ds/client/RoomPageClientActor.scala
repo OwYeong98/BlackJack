@@ -25,9 +25,12 @@ import ds.client.RoomPageClientActor.Start
 import ds.client.RoomPageClientActor.Ready
 import ds.client.RoomPageClientActor.NotReady
 import ds.client.RoomPageClientActor.LeaveRoom
+import ds.client.RoomPageClientActor.Kick
 import ds.server.RoomPageServerActor
 import ds.server.GamePageServerActor
 import ds.client.GamePageClientActor
+
+import java.util.UUID.randomUUID
 
 class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   implicit val timeout = Timeout(10 second)
@@ -52,17 +55,25 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
     case Join(name) =>
         hostServerActorRef ! RoomPageServerActor.JoinRoomAndSubscribeForUpdate(name,context.self)
     case Start() =>
+        hostServerActorRef ! RoomPageServerActor.StartGame()
 
     case Ready(name) =>
+        hostServerActorRef ! RoomPageServerActor.PlayerReady(name)
 
     case NotReady(name) =>
+        hostServerActorRef ! RoomPageServerActor.PlayerNotReady(name)
 
     case LeaveRoom(name) =>
+        hostServerActorRef ! RoomPageServerActor.PlayerLeaveRoom(name)
+
+    case Kick(name) =>
+        hostServerActorRef ! RoomPageServerActor.KickPlayer(name)
 
 
 
     /*********call from server*************************/
     case RoomPageServerActor.ServerAskAddPlayer(name) =>
+        println("add plater")
         if(MainApp.roomDetailPageControllerRef != null){
             Platform.runLater{
                 MainApp.roomDetailPageControllerRef.addPlayerToList(name)
@@ -72,13 +83,14 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
         if(MainApp.roomDetailPageControllerRef != null){
             Platform.runLater{
                 MainApp.roomDetailPageControllerRef.setHostName(name)
+               
             }
         }
 
     case RoomPageServerActor.ServerAskRemovePlayer(name) =>
         if(MainApp.roomDetailPageControllerRef != null){
             Platform.runLater{
-                MainApp.roomDetailPageControllerRef.setHostName(name)
+                MainApp.roomDetailPageControllerRef.removePlayerFromList(name)
             }
         }
 
@@ -101,8 +113,18 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
             }
         }
     case RoomPageServerActor.ServerAskStartGame(gameServerActorRef,yourName)=>
-        val gamePageClientActorRef = MainApp.system.actorOf(Props(new ds.client.GamePageClientActor(gameServerActorRef)), "gamepageclient")
+        val gamePageClientActorRef = MainApp.system.actorOf(Props(new ds.client.GamePageClientActor(gameServerActorRef)), "gamepageclient"+randomUUID().toString)
         gamePageClientActorRef ! GamePageClientActor.InitialConnectionWithServer(yourName)
+
+        MainApp.goToGamePage(yourName,gamePageClientActorRef)
+
+    case RoomPageServerActor.ServerAskRoomClosed()=>
+        if(MainApp.roomDetailPageControllerRef != null){
+            Platform.runLater{
+                MainApp.roomDetailPageControllerRef.roomHadClosed()
+            }
+        }
+
 
 
     case _=>
@@ -115,6 +137,7 @@ object RoomPageClientActor {
   final case class Ready(name:String)
   final case class NotReady(name:String)
   final case class LeaveRoom(name:String)
+  final case class Kick(name:String)
 
 
 

@@ -25,6 +25,10 @@ import ds.server.RoomPageServerActor.ServerAskSetHost
 import ds.server.RoomPageServerActor.ServerAskSetPlayerReady
 import ds.server.RoomPageServerActor.ServerAskSetPlayerUnReady
 import ds.server.RoomPageServerActor.ServerAskStartGame
+import ds.server.RoomPageServerActor.ServerAskRoomClosed
+import ds.server.RoomPageServerActor.ServerAskYouAreKicked
+
+import java.util.UUID.randomUUID
 
 class RoomPageServerActor(val hostName:String) extends Actor {
   implicit val timeout = Timeout(10 second)
@@ -50,27 +54,74 @@ class RoomPageServerActor(val hostName:String) extends Actor {
         //add player ref into the room
         playerListInRoom += (name -> clientRef)
 
-        //update player that are in the room
+        //send player list to client
         clientRef ! ServerAskSetHost(hostName)
 
-        for((playerName,playerActorRef) <- playerListInRoom){
-            //if not host we ask them to add because host is add using ServerAskSetHost
-            if(!playerName.toLowerCase().equals(hostName.toLowerCase())){
-                clientRef ! ServerAskAddPlayer(playerName)
+        if(playerListInRoom.isEmpty ==false ){
+            println(playerListInRoom)
+            for((playerName,playerActorRef) <- playerListInRoom){
+                //if not host we ask them to add because host is add using ServerAskSetHost
+                if(!playerName.toLowerCase().equals(hostName.toLowerCase())){
+                    clientRef ! ServerAskAddPlayer(playerName)
+                }
+            }
+
+            //update Other Client new player joined
+            for((clientName,actorRef) <- playerListInRoom){
+                if(actorRef != clientRef){
+                    actorRef ! ServerAskAddPlayer(name)
+                }
             }
         }
+        
+
+        
     case CloseRoom() =>
+        //cause room closed if we doesnt care if it can be send
+        //if cannot contact means they already leave room
+        try{
+            for((clientName,clientActorRef) <- playerListInRoom){
+                //notify everyone
+                clientActorRef ! ServerAskRoomClosed()
+            }
+        }catch{
+            case _: Throwable=>
+        }
+        
 
     case KickPlayer(name) =>
+        for((clientName,clientActorRef) <- playerListInRoom){
+            //if it is the player that we want to kick 
+            if(clientName.toLowerCase().equals(name.toLowerCase())){
+                //tell them they are kicked
+                clientActorRef ! ServerAskYouAreKicked()
+            }
+
+            //notify everyone
+            clientActorRef ! ServerAskRemovePlayer(name)
+        }
+  
 
     case PlayerReady(name) =>
+        for((clientName,clientActorRef) <- playerListInRoom){
+            //notify everyone
+            clientActorRef ! ServerAskSetPlayerReady(name)
+        }
 
     case PlayerNotReady(name) =>
+        for((clientName,clientActorRef) <- playerListInRoom){
+            //notify everyone
+            clientActorRef ! ServerAskSetPlayerUnReady(name)
+        }
 
     case PlayerLeaveRoom(name) =>
+        for((clientName,clientActorRef) <- playerListInRoom){
+            //notify everyone
+            clientActorRef ! ServerAskRemovePlayer(name)
+        }
 
     case StartGame() =>
-        val gamePageServerActorRef = MainApp.system.actorOf(Props(new ds.server.GamePageServerActor()), "gamepageserver")
+        val gamePageServerActorRef = MainApp.system.actorOf(Props(new ds.server.GamePageServerActor()), "gamepageserver"+randomUUID().toString)
 
         for((clientName,clientActorRef) <- playerListInRoom){
             clientActorRef ! ServerAskStartGame(gamePageServerActorRef,clientName)
@@ -98,4 +149,5 @@ object RoomPageServerActor {
   final case class ServerAskSetPlayerReady(name:String)
   final case class ServerAskSetPlayerUnReady(name:String)
   final case class ServerAskStartGame(gameServerActorRef:ActorRef,playerName:String)
+  final case class ServerAskRoomClosed()
 }
