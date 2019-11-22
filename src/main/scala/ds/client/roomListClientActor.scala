@@ -23,33 +23,22 @@ import scala.concurrent.ExecutionContext.Implicits._
 import ds.client.RoomListClientActor.Join
 import ds.client.RoomListClientActor.CreateRoom
 import ds.server.RoomListServerActor
+import ds.server.RoomPageServerActor
 
 import java.util.UUID.randomUUID
 
 class RoomListClientActor extends Actor {
-  implicit val timeout = Timeout(10 second)
+  implicit val timeout = Timeout(2 second)
 
   var serverOpt: Option[ActorSelection] = None    
 
   override def preStart(): Unit = {
     val server: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
     serverOpt = Option(server)
-    context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
-    context.system.eventStream.subscribe(self, classOf[akka.remote.AssociatedEvent])
 
   }
 
   def receive = {
-    //remove to the client that close connection
-    case DisassociatedEvent(localAddress, remoteAddress, _) =>
-      Platform.runLater{
-        val alert = new Alert(AlertType.Error){
-		        initOwner(MainApp.stage)
-		        title       = "Lost connection to server"
-		        headerText  = "Server Connection Lost"
-		        contentText = "Could Not Connect to Server!"
-		      }.showAndWait()
-      }
     
     /*********Call from controller************************/
     case "getRoomList" =>
@@ -82,6 +71,7 @@ class RoomListClientActor extends Actor {
               case hostActor: ActorRef =>
                 Platform.runLater{
                   MainApp.goToRoomDetailPage(roomNo,false,name,hostActor)
+                  MainApp.system.stop(context.self)
                 }
               case error:String =>
                 Platform.runLater {
@@ -110,7 +100,9 @@ class RoomListClientActor extends Actor {
           x match {
               case RoomListServerActor.SuccessCreateRoom(roomNo) =>
                 Platform.runLater{
+                  roomServer ! RoomPageServerActor.SetRoomNo(roomNo)
                   MainApp.goToRoomDetailPage(roomNo,true,name,roomServer)
+                  MainApp.system.stop(context.self)
                 }
               case error:String =>
                 Platform.runLater {

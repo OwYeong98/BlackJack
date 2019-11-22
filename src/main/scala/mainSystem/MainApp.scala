@@ -47,9 +47,20 @@ object MainApp extends JFXApp {
 
   val overrideConf = ConfigFactory.parseString(
     s"""
+    |
        |akka {
        |  loglevel = "INFO"
+       |  suppress-json-serializer-warning = on
        |
+ |  cluster{
+ |  auto-down-unreachable-after= 100ms
+ |  failure-detector {
+       |   heartbeat-interval = 1s
+       |   acceptable-heartbeat-pause = 1s
+       |   expected-response-after = 100ms
+       |   threshold = 2.0
+       | }
+|}
  |  actor {
        |    provider = "akka.remote.RemoteActorRefProvider"
        |  }
@@ -60,6 +71,7 @@ object MainApp extends JFXApp {
        |      hostname = "${ipaddress.getHostAddress}"
        |      port = 0
        |    }
+       |    watch-failure-detector.acceptable-heartbeat-pause = 1s
        |
  |    log-sent-messages = on
        |    log-received-messages = on
@@ -68,6 +80,7 @@ object MainApp extends JFXApp {
  |}
        |
      """.stripMargin)
+
   val myConf = overrideConf.withFallback(ConfigFactory.load())
   val system = ActorSystem("blackjack", myConf)
   val roomListServerRef = system.actorOf(Props[ds.server.RoomListServerActor](), "roomlistserver")
@@ -89,6 +102,10 @@ object MainApp extends JFXApp {
     }
   }
   stage.setResizable(false)
+  
+  stage.onCloseRequest = handle( {
+    system.terminate
+  })
    /******************/
 
   def goToMainPage() = {

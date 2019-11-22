@@ -24,7 +24,7 @@ import ds.client.GamePageClientActor.InitialConnectionWithServer
 import ds.server.GamePageServerActor
 
 class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
-  implicit val timeout = Timeout(10 second)
+  implicit val timeout = Timeout(2 second)
 
   //hostServerActorRef store the GamePageServerActor reference that you can communicate with
   //example hostServerActorRef ! "haha"

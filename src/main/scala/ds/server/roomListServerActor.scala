@@ -1,6 +1,6 @@
 package ds.server
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Terminated}
 import scalafx.collections.ObservableHashSet
 import akka.pattern.ask
 import akka.remote.DisassociatedEvent
@@ -21,7 +21,7 @@ import ds.server.RoomListServerActor.SuccessCreateRoom
 import ds.server.RoomListServerActor.PlayerLeaveRoom
 
 class RoomListServerActor extends Actor {
-  implicit val timeout = Timeout(10 second)
+  implicit val timeout = Timeout(2 second)
 
   //this variable store all the client actor Ref viewing the roomlist page
   val clientViewingRoomListPage = new ObservableHashSet[ActorRef]()
@@ -31,23 +31,29 @@ class RoomListServerActor extends Actor {
 
 
   override def preStart(): Unit = {
-    context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
-    context.system.eventStream.subscribe(self, classOf[akka.remote.AssociatedEvent])
+
 
   }
 
   def receive = {
     //remove to the client that close connection
-    case DisassociatedEvent(localAddress, remoteAddress, _) =>
-      if(clientViewingRoomListPage.exists(x => x.path.address.equals(remoteAddress))){
-        val refOpt = clientViewingRoomListPage.find(x => x.path.address.equals(remoteAddress))
-        for (ref <- refOpt){
-          clientViewingRoomListPage.remove(ref)
+    case Terminated(clientRef) =>
+      if(clientViewingRoomListPage.exists(_ == clientRef)){
+        clientViewingRoomListPage.remove(clientRef)
+      }else{
+        for(room <- roomList){
+          if(room.hostActorRef == clientRef){
+            //remove room if lost connection to server
+            context.self ! RemoveRoom(room.roomNo)
+          }
         }
       }
+      
+
     case GetRoomListAndSubscribeForUpdate(actorRef) =>
       //add the client ActorRef to the list so that if room got any update we ill notify them
       clientViewingRoomListPage += actorRef
+      context.watch(actorRef)
 
       var roomListUpdate: ArrayBuffer[RoomUpdate] = new ArrayBuffer[RoomUpdate]()
 
@@ -77,6 +83,9 @@ class RoomListServerActor extends Actor {
       }
 
       sender ! SuccessCreateRoom(newRoomNo)
+
+      //keep track of wheter this host server can connect
+      context.watch(hostActorRef)
     case Join(roomNo,name) =>
       var roomRef:RoomInfo = null
 
@@ -110,6 +119,12 @@ class RoomListServerActor extends Actor {
           roomRef = room
         }
       }
+
+      //tell everyone to remove room
+      for(clientRef <- clientViewingRoomListPage){
+        clientRef ! RemoveRoom(roomNo)
+      }
+
       //remove the room from list
       roomList -= roomRef
     case PlayerLeaveRoom(roomNo, playerName) =>

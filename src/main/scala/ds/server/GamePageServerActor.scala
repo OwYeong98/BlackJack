@@ -14,7 +14,7 @@ import scala.concurrent.duration._
 import ds.server.GamePageServerActor.JoinGameAndSubscribeForUpdate
 
 class GamePageServerActor extends Actor {
-  implicit val timeout = Timeout(10 second)
+  implicit val timeout = Timeout(2 second)
 
   //variable playerListInRoom contain a Map where key is name and value is ActorRef
   //example playerListInRoom("John") will return GamePageClientActorRef of John

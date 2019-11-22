@@ -1,7 +1,7 @@
 package ds.server
 
 import MainSystem.MainApp
-import akka.actor.{Actor, ActorRef, Props,ActorSelection}
+import akka.actor.{Actor, ActorRef, Props,ActorSelection,Terminated}
 import scalafx.collections.ObservableHashSet
 import akka.pattern.ask
 import akka.remote.DisassociatedEvent
@@ -27,34 +27,41 @@ import ds.server.RoomPageServerActor.ServerAskSetPlayerUnReady
 import ds.server.RoomPageServerActor.ServerAskStartGame
 import ds.server.RoomPageServerActor.ServerAskRoomClosed
 import ds.server.RoomPageServerActor.ServerAskYouAreKicked
+import ds.server.RoomPageServerActor.SetRoomNo
 
 import ds.server.RoomListServerActor
 import java.util.UUID.randomUUID
 
 class RoomPageServerActor(val hostName:String) extends Actor {
-  implicit val timeout = Timeout(10 second)
+  implicit val timeout = Timeout(2 second)
 
+  var roomNo = -1
   val playerListInRoom = Map[String,ActorRef]()
   val playerReadyState = Map[String,Boolean]()
 
 
   override def preStart(): Unit = {
-    context.system.eventStream.subscribe(self, classOf[akka.remote.DisassociatedEvent])
-    context.system.eventStream.subscribe(self, classOf[akka.remote.AssociatedEvent])
+
   }
 
   def receive = {
-    //remove to the client that close connection
-    case DisassociatedEvent(localAddress, remoteAddress, _) =>
-      if(playerListInRoom.exists(x => x._2.path.address.equals(remoteAddress))){
-        val refOpt = playerListInRoom.find(x => x._2.path.address.equals(remoteAddress))
-        for (ref <- refOpt){
-          playerListInRoom.remove(ref._1)
+    case SetRoomNo(roomNo)=>
+        this.roomNo = roomNo
+
+    case Terminated(actorRef) =>
+        for((name, clientRef) <- playerListInRoom){
+            if(clientRef == actorRef){
+                playerListInRoom.remove(name)
+                context.self ! PlayerLeaveRoom(name,roomNo)
+            }
         }
-      }
+        
     case JoinRoomAndSubscribeForUpdate(name,clientRef) =>
         //add player ref into the room
         playerListInRoom += (name -> clientRef)
+
+        //keep track whether this client disconnect if disconnect Terminater(actorRef) will be called
+        context.watch(clientRef)
         
         //if is host he should be ready for default
         if(name.toLowerCase().equals(hostName.toLowerCase())){
@@ -118,6 +125,7 @@ class RoomPageServerActor(val hostName:String) extends Actor {
             clientActorRef ! ServerAskRemovePlayer(name)
         }
         playerListInRoom.remove(name)
+        playerReadyState.remove(name)
 
         //tell room list server to remove room from list
         val roomListserver: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
@@ -147,6 +155,9 @@ class RoomPageServerActor(val hostName:String) extends Actor {
             //tell room list server to remove room from list
             val roomListserver: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
             roomListserver ! RoomListServerActor.RemoveRoom(roomNo)
+
+            //close self connection  cause host leaved
+            MainApp.system.stop(context.self)
         }else{
             for((clientName,clientActorRef) <- playerListInRoom){
                 //notify everyone
@@ -155,8 +166,11 @@ class RoomPageServerActor(val hostName:String) extends Actor {
             //tell room list server to someone leaved room 
             val roomListserver: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
             roomListserver ! RoomListServerActor.PlayerLeaveRoom(roomNo,name)
+
+            playerListInRoom.remove(name)
+            playerReadyState.remove(name)
         }
-        playerListInRoom.remove(name)
+        
         
 
     case StartGame() =>
@@ -209,4 +223,5 @@ object RoomPageServerActor {
   final case class ServerAskSetPlayerUnReady(name:String)
   final case class ServerAskStartGame(gameServerActorRef:ActorRef,playerName:String)
   final case class ServerAskRoomClosed()
+  final case class SetRoomNo(roomNo:Int)
 }
