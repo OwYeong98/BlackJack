@@ -18,6 +18,7 @@ import ds.server.RoomListServerActor.CreateRoom
 import ds.server.RoomListServerActor.Join
 import ds.server.RoomListServerActor.RemoveRoom
 import ds.server.RoomListServerActor.SuccessCreateRoom
+import ds.server.RoomListServerActor.PlayerLeaveRoom
 
 class RoomListServerActor extends Actor {
   implicit val timeout = Timeout(10 second)
@@ -111,6 +112,21 @@ class RoomListServerActor extends Actor {
       }
       //remove the room from list
       roomList -= roomRef
+    case PlayerLeaveRoom(roomNo, playerName) =>
+      var roomRef:RoomInfo = null
+
+      for(room <- roomList){
+        if(room.roomNo == roomNo){
+          roomRef = room
+        }
+      }
+
+      roomRef.playerList -= playerName
+
+      //notify all client about num of player in room
+      for(clientRef <- clientViewingRoomListPage){
+        clientRef ! RoomUpdate(roomRef.roomNo,roomRef.hostName,roomRef.playerList.length)
+      }
 
     case _=>
       println("nothing")
@@ -123,6 +139,6 @@ object RoomListServerActor {
   final case class CreateRoom(hostName: String, hostActorRef: ActorRef)
   final case class RemoveRoom(roomNo: Int)
   final case class SuccessCreateRoom(assignedRoomNo:Int)
-
+  final case class PlayerLeaveRoom(roomNo:Int, playerName:String)
 
 }

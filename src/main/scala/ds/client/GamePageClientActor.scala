@@ -41,7 +41,16 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
     case InitialConnectionWithServer(name) =>
       hostServerActorRef ! GamePageServerActor.JoinGameAndSubscribeForUpdate(name,context.self)
     
-
+    case "testingConnection" =>
+      Platform.runLater{
+        //MainApp.gamePageControllerRef is the controller reference u can use to call function in controller
+        val alert = new Alert(AlertType.Error){
+          initOwner(MainApp.stage)
+          title       = "Receive call from server"
+          headerText  = "Testing"
+          contentText = "can Received Message from servver"
+        }.showAndWait()	
+      }
 
 
     /*********call from server*************************/

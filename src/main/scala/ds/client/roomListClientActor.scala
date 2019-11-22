@@ -42,12 +42,14 @@ class RoomListClientActor extends Actor {
   def receive = {
     //remove to the client that close connection
     case DisassociatedEvent(localAddress, remoteAddress, _) =>
-      val alert = new Alert(AlertType.Error){
+      Platform.runLater{
+        val alert = new Alert(AlertType.Error){
 		        initOwner(MainApp.stage)
 		        title       = "Lost connection to server"
 		        headerText  = "Server Connection Lost"
 		        contentText = "Could Not Connect to Server!"
 		      }.showAndWait()
+      }
     
     /*********Call from controller************************/
     case "getRoomList" =>
@@ -116,7 +118,7 @@ class RoomListClientActor extends Actor {
                     initOwner(MainApp.stage)
                     title       = "Error Create Room"
                     headerText  = "Error"
-                    contentText = x.asInstanceOf[String]
+                    contentText = error.asInstanceOf[String]
                   }.showAndWait()	
                 }
               case _ => 
@@ -130,7 +132,12 @@ class RoomListClientActor extends Actor {
     case RoomListServerActor.RoomUpdate(no,hostName,noOfPlayer) =>
       if(MainApp.roomListPageControllerRef != null){
         Platform.runLater{
-          MainApp.roomListPageControllerRef.addNewRoomOrUpdate(no,hostName,noOfPlayer)
+          try{
+            MainApp.roomListPageControllerRef.addNewRoomOrUpdate(no,hostName,noOfPlayer)
+          }catch{
+            case e:Throwable=>
+          }
+          
         }
       }
       

@@ -26,9 +26,15 @@ class GamePageServerActor extends Actor {
   }
 
   def receive = {
+    //this startGame will be called when all player successfully connected
     case "startGame" =>
         //this will be called when the player press startgame in roomdetailpage  
         //place game logic here maybe
+
+        //test whether all client can be contacted
+        for((name,clientRef) <- playerListInRoom){
+            clientRef ! "testingConnection"
+        }
     
     case JoinGameAndSubscribeForUpdate(name,clientRef) =>
         //add player ref into the room

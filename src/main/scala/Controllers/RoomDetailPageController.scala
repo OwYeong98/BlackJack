@@ -99,14 +99,15 @@ class RoomDetailPageController(
 
     //this function will be called when player press leaveroom button
     def leaveRoomAction() = {
-        roomPageClientRef ! RoomPageClientActor.LeaveRoom(playerName)
+        roomPageClientRef ! RoomPageClientActor.LeaveRoom(playerName,roomId)
+        MainApp.system.stop(roomPageClientRef)
         MainApp.goToRoomListPage()
     }
 
     //this function will be called when host kick someone
     //nameOfPlayer store the name of the player who get kicked
     def kicked(nameOfPlayer: String){
-        roomPageClientRef ! RoomPageClientActor.Kick(nameOfPlayer)
+        roomPageClientRef ! RoomPageClientActor.Kick(nameOfPlayer,roomId)
 
         
     }

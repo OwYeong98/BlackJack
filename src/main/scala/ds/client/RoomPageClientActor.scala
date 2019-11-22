@@ -44,18 +44,36 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   def receive = {
     //remove to the client that close connection
     case DisassociatedEvent(localAddress, remoteAddress, _) =>
-      val alert = new Alert(AlertType.Error){
-		        initOwner(MainApp.stage)
-		        title       = "Lost connection to server"
-		        headerText  = "Server Connection Lost"
-		        contentText = "Could Not Connect to Server!"
-		      }.showAndWait()
+      Platform.runLater{
+        val alert = new Alert(AlertType.Error){
+                    initOwner(MainApp.stage)
+                    title       = "Lost connection to server"
+                    headerText  = "Server Connection Lost"
+                    contentText = "Could Not Connect to Server!"
+                }.showAndWait()
+      }
     
     /*********Call from controller************************/
     case Join(name) =>
         hostServerActorRef ! RoomPageServerActor.JoinRoomAndSubscribeForUpdate(name,context.self)
     case Start() =>
-        hostServerActorRef ! RoomPageServerActor.StartGame()
+        val result = hostServerActorRef ? RoomPageServerActor.StartGame()
+        result.foreach(x => {
+          x match {
+              case "ok"=>
+                
+              case error:String =>
+                Platform.runLater {
+                  val alert = new Alert(AlertType.Error){
+                    initOwner(MainApp.stage)
+                    title       = "Error Start Game"
+                    headerText  = "Someone Not Ready"
+                    contentText = error.asInstanceOf[String]
+                  }.showAndWait()	
+                }
+              case _ => 
+          }
+        })
 
     case Ready(name) =>
         hostServerActorRef ! RoomPageServerActor.PlayerReady(name)
@@ -63,17 +81,16 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
     case NotReady(name) =>
         hostServerActorRef ! RoomPageServerActor.PlayerNotReady(name)
 
-    case LeaveRoom(name) =>
-        hostServerActorRef ! RoomPageServerActor.PlayerLeaveRoom(name)
+    case LeaveRoom(name,roomNo) =>
+        hostServerActorRef ! RoomPageServerActor.PlayerLeaveRoom(name,roomNo)
 
-    case Kick(name) =>
-        hostServerActorRef ! RoomPageServerActor.KickPlayer(name)
+    case Kick(name,roomNo) =>
+        hostServerActorRef ! RoomPageServerActor.KickPlayer(name,roomNo)
 
 
 
     /*********call from server*************************/
     case RoomPageServerActor.ServerAskAddPlayer(name) =>
-        println("add plater")
         if(MainApp.roomDetailPageControllerRef != null){
             Platform.runLater{
                 MainApp.roomDetailPageControllerRef.addPlayerToList(name)
@@ -116,12 +133,20 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
         val gamePageClientActorRef = MainApp.system.actorOf(Props(new ds.client.GamePageClientActor(gameServerActorRef)), "gamepageclient"+randomUUID().toString)
         gamePageClientActorRef ! GamePageClientActor.InitialConnectionWithServer(yourName)
 
-        MainApp.goToGamePage(yourName,gamePageClientActorRef)
+        Platform.runLater{
+            MainApp.goToGamePage(yourName,gamePageClientActorRef)
+        }
 
     case RoomPageServerActor.ServerAskRoomClosed()=>
         if(MainApp.roomDetailPageControllerRef != null){
             Platform.runLater{
-                MainApp.roomDetailPageControllerRef.roomHadClosed()
+                try{
+                    MainApp.roomDetailPageControllerRef.roomHadClosed()
+                }catch{
+                    case e:Throwable =>
+
+                }
+                
             }
         }
 
@@ -136,8 +161,8 @@ object RoomPageClientActor {
   final case class Start()
   final case class Ready(name:String)
   final case class NotReady(name:String)
-  final case class LeaveRoom(name:String)
-  final case class Kick(name:String)
+  final case class LeaveRoom(name:String,roomNo:Int)
+  final case class Kick(name:String,roomNo:Int)
 
 
 
