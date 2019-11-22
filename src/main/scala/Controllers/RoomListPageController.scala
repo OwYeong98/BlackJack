@@ -1,7 +1,7 @@
 package Controllers
 
 import MainSystem.MainApp
-import Models.room
+import Models.Room
 
 import scalafxml.core.macros.sfxml
 import scalafx.scene.control._
@@ -15,11 +15,14 @@ import scalafx.scene.layout.VBox
 import scalafx.scene.control.{Alert,TableColumn,TableView,TableCell}
 import scalafx.collections.ObservableBuffer
 import scalafx.beans.property.{StringProperty, ObjectProperty}
+import java.util.UUID.randomUUID
 
 import scalafx.scene.control.Button
 import scalafx.scene.image.ImageView
 import scalafx.scene.image.Image
 
+import akka.actor.{Actor, ActorRef,Props}
+import ds.client.RoomListClientActor
 
 
 
@@ -30,10 +33,10 @@ class RoomListPageController(
 	val createRoomButton: Button, 
 	val joinButton: Button,
 	val backButton: Button,
-	val roomTable: TableView[room],
-	val roomNoColumn: TableColumn[room, Int],
-	val hostNameColumn: TableColumn[room, String],
-	val noOfPlayerColumn: TableColumn[room, String],
+	val roomTable: TableView[Room],
+	val roomNoColumn: TableColumn[Room, Int],
+	val hostNameColumn: TableColumn[Room, String],
+	val noOfPlayerColumn: TableColumn[Room, String],
 	val nameInput: TextField
 	 )
 {	
@@ -45,8 +48,11 @@ class RoomListPageController(
 
 
 	//Kind of arraylist for displaying data to table
-	var roomList:ObservableBuffer[room] = new ObservableBuffer[room]()
+	var roomList:ObservableBuffer[Room] = new ObservableBuffer[Room]()
 	initializeRoomList()
+
+	//this store the roomListClientRef
+	var roomListClientRef: ActorRef = null
 
 	/**********************Function For Network**********************************************/
 	initializeData()
@@ -56,13 +62,13 @@ class RoomListPageController(
 		//maybe ask server for room list available here
 		// and also server can keep track of akka actor and provide update as needed
 
+		//this actor will responsible for all function of this page including instruction from server
+		roomListClientRef = MainApp.system.actorOf(Props[ds.client.RoomListClientActor](), "client"+randomUUID().toString)
 		
+		//get room list will update the roomlist to UI and subscribe for receiving update from server
+		roomListClientRef ! "getRoomList"
 
-		//***sample***
-		addNewRoomOrUpdate(1,"John",5)
-		addNewRoomOrUpdate(2,"Jack",4)
-		addNewRoomOrUpdate(3,"Smith",7)
-
+		
 	}
 
 	//this function will be called when the createRoom button is clicked
@@ -81,19 +87,11 @@ class RoomListPageController(
 			
 		} else{
 			//create room in server
-			
+			roomListClientRef ! RoomListClientActor.CreateRoom(userName)
+
+			//page changing will be handle in the roomListClientRef Actor
 
 
-
-
-
-
-
-
-
-
-			//chg to room detail page
-			MainApp.goToRoomDetailPage(1,true,userName)
 		}
 	}
 
@@ -102,7 +100,7 @@ class RoomListPageController(
 		val selectedIndex = roomTable.selectionModel().selectedIndex.value
 
 		if (selectedIndex >= 0) {
-			var selectedRoom:room = roomList.get(selectedIndex)
+			var selectedRoom:Room = roomList.get(selectedIndex)
 
 			var userName:String = nameInput.text.value
 			if (userName == "") {
@@ -114,14 +112,10 @@ class RoomListPageController(
 			      }.showAndWait()	
 			} else{
 				//join room in server
-				
+				roomListClientRef ! RoomListClientActor.Join(selectedRoom.roomNo,userName)
 
+				//page changing will be handle in the roomListClientRef Actor
 
-
-
-
-				//chg to room detail page
-				MainApp.goToRoomDetailPage(selectedRoom.roomNo,false,userName)
 			}
 			
 		} else{
@@ -135,6 +129,11 @@ class RoomListPageController(
 		}
 	}
 
+	def backAction() = {
+		MainApp.system.stop(roomListClientRef)
+		MainApp.goToMainPage()
+	}
+
 
 	/***************************************************************************************/
 
@@ -144,7 +143,7 @@ class RoomListPageController(
 	//call this function to add a row to the table
 	//Note calling addNewRoomOrUpdate(1,"John",6) will update the row instead of adding new row if table already have a row with id 1
 	def addNewRoomOrUpdate(roomNo:Int,hostName:String,noOfPlayer:Int) = {
-		var foundRoom:room = null
+		var foundRoom:Room = null
 		for(room <- roomList){
 			if(room.roomNo == roomNo)
 				foundRoom = room
@@ -152,7 +151,7 @@ class RoomListPageController(
 
 		//if not exist add new
 		if(foundRoom == null){
-			roomList += new room(roomNo,hostName,noOfPlayer)
+			roomList += new Room(roomNo,hostName,noOfPlayer)
 		}else{
 			foundRoom.roomNo = roomNo
 			foundRoom.hostName = hostName
@@ -162,7 +161,7 @@ class RoomListPageController(
 
 	//call this function delete a row with a id in the table 
 	def deleteRoom(roomNo:Int) = {
-		var foundRoom:room = null
+		var foundRoom:Room = null
 		for(room <- roomList){
 			if(room.roomNo == roomNo)
 				foundRoom = room
@@ -184,7 +183,5 @@ class RoomListPageController(
 
 
 	
-	def backAction() = {
-		MainApp.goToMainPage()
-	}
+	
 }
