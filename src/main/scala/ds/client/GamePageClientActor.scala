@@ -72,6 +72,12 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
       context.become(myTurn)
     }
 
+    case CardDrawn(pname, cardDrawn) => {
+      Platform.runLater{
+        MainApp.gamePageControllerRef.sendCard(pname,cardDrawn)
+      }
+    }
+    
     case "Round Ends" => {
       println("Round ended changing to DeclareWinnerStage now!")
       context.become(DeclareWinnerStage)
