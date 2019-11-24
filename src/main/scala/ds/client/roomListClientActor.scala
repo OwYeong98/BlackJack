@@ -5,7 +5,7 @@ import MainSystem.MainApp
 import scalafx.scene.control._
 import scalafx.scene.input._
 
-import akka.actor.{Actor, ActorRef,ActorSelection, Props}
+import akka.actor.{Actor, ActorRef,ActorSelection, Props,DeadLetter}
 import scalafx.collections.ObservableHashSet
 import akka.pattern.ask
 import akka.remote.DisassociatedEvent
@@ -36,10 +36,22 @@ class RoomListClientActor extends Actor {
     val server: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
     serverOpt = Option(server)
 
+    MainApp.system.eventStream.subscribe(context.self, classOf[DeadLetter])
+
   }
 
   def receive = {
-    
+    case d: DeadLetter => {
+      Platform.runLater {
+        val alert = new Alert(AlertType.Error){
+          initOwner(MainApp.stage)
+          title       = "Lost Connection to room server"
+          headerText  = "Cannot Communicate with server"
+          contentText = "Please check ip address and port in settings!"
+        }.showAndWait()	
+        MainApp.goToMainPage()
+      }
+    }
     /*********Call from controller************************/
     case "getRoomList" =>
         for (server <- serverOpt){

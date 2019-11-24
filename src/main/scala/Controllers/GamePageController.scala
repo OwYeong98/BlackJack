@@ -275,19 +275,21 @@ class GamePageController(
 		    override def run {
 				Platform.runLater(new Runnable() {
    					override def run {
+						popUpTitle.visible = true
 						popUpTitle.text = playerNameTurn +" Turn!"
    					}
    				});
 				
-				Thread.sleep(500)
+				Thread.sleep(2000)
 				Platform.runLater(new Runnable() {
    					override def run {
+						popUpTitle.visible=false
 						popUpTitle.text = ""
    					}
    				});
 		    }
 		}.start()
-		println(s"It is $playerNameTurn now")
+	
 		//if it is this client turn show button
 		if(playerName == playerNameTurn){
 			showActionButton(false)
@@ -300,7 +302,7 @@ class GamePageController(
 	def sendCard(name:String,card:String) = {
 		//if the player is self
 		if(playerName == name){
-			animation_sendCardWithReveal(name,card,false)
+			animation_getCard(card)
 		}else{
 			animation_sendHiddenCard(name)
 		}	

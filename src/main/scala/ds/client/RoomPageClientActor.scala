@@ -55,8 +55,8 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
     /*********Call from controller************************/
     case Join(name) =>
         hostServerActorRef ! RoomPageServerActor.JoinRoomAndSubscribeForUpdate(name,context.self)
-    case Start() =>
-        val result = hostServerActorRef ? RoomPageServerActor.StartGame()
+    case Start(roomNo) =>
+        val result = hostServerActorRef ? RoomPageServerActor.StartGame(roomNo)
         result.foreach(x => {
           x match {
               case "ok"=>
@@ -134,6 +134,7 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
 
         Platform.runLater{
             MainApp.goToGamePage(yourName,gamePageClientActorRef)
+            MainApp.system.stop(context.self)
         }
 
     case RoomPageServerActor.ServerAskRoomClosed()=>
@@ -157,7 +158,7 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
 
 object RoomPageClientActor {
   final case class Join(name:String)
-  final case class Start()
+  final case class Start(roomNo:Int)
   final case class Ready(name:String)
   final case class NotReady(name:String)
   final case class LeaveRoom(name:String,roomNo:Int)

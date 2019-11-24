@@ -173,7 +173,7 @@ class RoomPageServerActor(val hostName:String) extends Actor {
         
         
 
-    case StartGame() =>
+    case StartGame(roomNo) =>
         
         var playerNotReady: String = ""
         var isAllReady:Boolean = true
@@ -186,6 +186,10 @@ class RoomPageServerActor(val hostName:String) extends Actor {
         }
         
         if(isAllReady == true){
+            //remove the room cause already start game
+            val roomListserver: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
+            roomListserver ! RoomListServerActor.RemoveRoom(roomNo)
+
             val gamePageServerActorRef = MainApp.system.actorOf(Props(new ds.server.GamePageServerActor()), "gamepageserver"+randomUUID().toString)
 
             for((clientName,clientActorRef) <- playerListInRoom){
@@ -196,6 +200,7 @@ class RoomPageServerActor(val hostName:String) extends Actor {
             Thread.sleep(2000)
             gamePageServerActorRef ! "startGame"
             sender ! "ok"
+            MainApp.system.stop(context.self)
         }else{
             sender ! playerNotReady+" are not Ready."
         }
@@ -211,7 +216,7 @@ object RoomPageServerActor {
   final case class JoinRoomAndSubscribeForUpdate(name:String,ref: ActorRef)
   final case class CloseRoom(roomNo:Int)
   final case class KickPlayer(name: String,roomNo:Int)
-  final case class StartGame()
+  final case class StartGame(roomNo:Int)
   final case class PlayerReady(name: String)
   final case class PlayerNotReady(name: String)
   final case class PlayerLeaveRoom(name: String, roomNo: Int)

@@ -74,7 +74,7 @@ class RoomDetailPageController(
 
     //this function will be called when player press start button
     def startAction() = {
-        roomPageClientRef ! RoomPageClientActor.Start()
+        roomPageClientRef ! RoomPageClientActor.Start(this.roomId)
 
         //MainApp.goToGamePage(roomId,playerName)
     }
