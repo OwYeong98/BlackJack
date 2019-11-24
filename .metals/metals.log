@@ -1,6 +1,0 @@
-INFO  time: initialize in 0.88s
-WARN  no build target: C:\Users\User\Desktop\Sunway Backup\Computer Science\Distributed System\BlackJack\src\main\scala\mainSystem\MainApp.scala
-WARN  no build target: C:\Users\User\Desktop\Sunway Backup\Computer Science\Distributed System\BlackJack\src\main\scala\Controllers\GamePageController.scala
-WARN  no build target: C:\Users\User\Desktop\Sunway Backup\Computer Science\Distributed System\BlackJack\src\main\scala\Controllers\RoomListPageController.scala
-WARN  no build target: C:\Users\User\Desktop\Sunway Backup\Computer Science\Distributed System\BlackJack\src\main\scala\Controllers\RoomDetailPageController.scala
-INFO  shutting down Metals

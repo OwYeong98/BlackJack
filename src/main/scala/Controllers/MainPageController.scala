@@ -21,6 +21,15 @@ import javafx.scene.layout.BackgroundPosition
 import javafx.scene.layout.BackgroundSize
 import javafx.scene.layout.Background
 
+import akka.actor.{Actor, ActorRef,ActorSelection}
+import akka.util.Timeout
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.Await
+import MainSystem.MainApp
+import java.time.Duration
+import scala.util.Success
+import scala.util.Failure
 
 @sfxml
 class MainPageController(
@@ -30,6 +39,7 @@ class MainPageController(
 	val background: ImageView
 	 )
 {	
+	
 
 	//Initialize graphic
 	//set Anchor Pane background Image
@@ -47,7 +57,24 @@ class MainPageController(
 
 
 	def startAction() = {
-		MainApp.goToRoomListPage()
+		//test connection
+		try{
+			//test connection
+			//actorselection will throw error if cant connect after 2 second
+			val server = Await.result(MainApp.system.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver").resolveOne(2 second),2 seconds)
+			
+			//if can go here means connection success can go roomlistpage
+			MainApp.goToRoomListPage()
+		}catch{
+			case e:Exception=>
+				val alert = new Alert(AlertType.Error){
+		        initOwner(MainApp.stage)
+		        title       = "Connection error"
+		        headerText  = "Could not connect to server"
+		        contentText = "Please check ip address and port in settings"
+		      }.showAndWait()
+		}	
+
 	}
 
 	def settingAction() = {

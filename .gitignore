@@ -15,6 +15,9 @@ project/plugins/project/
 .history
 .cache
 .lib/
+.metals/
+metals.sbt
+metals/project/
 
 ### VisualStudioCode ###
 .vscode/*

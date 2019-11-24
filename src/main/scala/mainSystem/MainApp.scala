@@ -10,14 +10,86 @@ import javafx.{scene => jfxs}
 import scalafx.stage.{Modality, Stage}
 import java.net.{ServerSocket, Socket, InetAddress}
 
+import ds._
+import java.net.NetworkInterface
+import akka.actor.{ActorSystem, Props, ActorRef}
+import com.typesafe.config.ConfigFactory
+import scala.collection.JavaConverters._
 
 
 
 
 object MainApp extends JFXApp {
+  var roomListPageControllerRef:RoomListPageController#Controller = null
+  var roomDetailPageControllerRef:RoomDetailPageController#Controller = null
+  var gamePageControllerRef:GamePageController#Controller = null
 
   var ipAddress:String = ""
- 
+  var port:Int = -1
+  
+  /*********Ask for what port to bind*******/
+  var count = -1
+  val addresses = (for (inf <- NetworkInterface.getNetworkInterfaces.asScala;
+                        add <- inf.getInetAddresses.asScala) yield {
+    count = count + 1
+    (count -> add)
+  }).toMap
+  for((i, add) <- addresses){
+    println(s"$i = $add")
+  }
+  println("please select which interface to bind")
+  var selection: Int = 0
+  do {
+    selection = scala.io.StdIn.readInt()
+  } while(!(selection >= 0 && selection < addresses.size))
+
+  val ipaddress = addresses(selection)
+
+  val overrideConf = ConfigFactory.parseString(
+    s"""
+    |
+       |akka {
+       |  loglevel = "INFO"
+       |  suppress-json-serializer-warning = on
+       |
+ |  cluster{
+ |  auto-down-unreachable-after= 100ms
+ |  failure-detector {
+       |   heartbeat-interval = 1s
+       |   acceptable-heartbeat-pause = 1s
+       |   expected-response-after = 100ms
+       |   threshold = 2.0
+       | }
+|}
+ |  actor {
+       |    provider = "akka.remote.RemoteActorRefProvider"
+       |  }
+       |
+ |  remote {
+       |    enabled-transports = ["akka.remote.netty.tcp"]
+       |    netty.tcp {
+       |      hostname = "${ipaddress.getHostAddress}"
+       |      port = 0
+       |    }
+       |    watch-failure-detector.acceptable-heartbeat-pause = 1s
+       |
+ |    log-sent-messages = on
+       |    log-received-messages = on
+       |  }
+       |
+ |}
+       |
+     """.stripMargin)
+
+  val myConf = overrideConf.withFallback(ConfigFactory.load())
+  val system = ActorSystem("blackjack", myConf)
+  val roomListServerRef = system.actorOf(Props[ds.server.RoomListServerActor](), "roomlistserver")
+  
+
+
+
+
+  /***Show Stage UI***/
   val rootResource = getClass.getResource("/Views/MainPage.fxml")
   val loader = new FXMLLoader(rootResource, NoDependencyResolver)
   loader.load();
@@ -30,7 +102,11 @@ object MainApp extends JFXApp {
     }
   }
   stage.setResizable(false)
-
+  
+  stage.onCloseRequest = handle( {
+    system.terminate
+  })
+   /******************/
 
   def goToMainPage() = {
     val resource = getClass.getResource("/Views/MainPage.fxml")
@@ -40,6 +116,11 @@ object MainApp extends JFXApp {
     val scene = new Scene(roots)
     
     stage.setScene(scene)
+
+    roomListPageControllerRef = null
+    roomDetailPageControllerRef = null
+    gamePageControllerRef = null
+
   } 
   
   def goToRoomListPage() = {
@@ -47,37 +128,59 @@ object MainApp extends JFXApp {
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
+    var controller = loader.getController[RoomListPageController#Controller]
     val scene = new Scene(roots)
     
     stage.setScene(scene)
+    roomListPageControllerRef = controller
+    roomDetailPageControllerRef = null
+    gamePageControllerRef = null
   } 
 
-  def goToRoomDetailPage(roomNo:Int,isHost:Boolean, playerName: String) = {
+  def goToRoomDetailPage(roomNo:Int,isHost:Boolean, playerName: String, hostActorRef:ActorRef) = {
     val resource = getClass.getResource("/Views/RoomDetailPage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[RoomDetailPageController#Controller]
+
+    roomListPageControllerRef = null
+    roomDetailPageControllerRef = controller
+    gamePageControllerRef = null
     controller.setIsHost(isHost)
-    controller.initializeRoomDetail(roomNo)
     controller.playerName = playerName
+    controller.initializeRoomDetail(roomNo,hostActorRef)
+    
 
     val scene = new Scene(roots)
     
     stage.setScene(scene)
+
+    
+
+    
+  
   } 
 
-   def goToGamePage(roomNo: Int, isHost: Boolean, playerName: String) = {
+   def goToGamePage(playerName: String, clientActorRef:ActorRef) = {
     val resource = getClass.getResource("/Views/GamePage.fxml")
     val loader = new FXMLLoader(resource, NoDependencyResolver)
     loader.load();
     val roots = loader.getRoot[jfxs.layout.AnchorPane]
     var controller = loader.getController[GamePageController#Controller]
-    controller.initializeData(roomNo,isHost,playerName)
+
+    roomListPageControllerRef = null
+    roomDetailPageControllerRef = null
+    gamePageControllerRef = controller
+
+
+    controller.initializeData(playerName,clientActorRef)
 
     val scene = new Scene(roots)
     
     stage.setScene(scene)
+
+    
   } 
 
   def showSettingDialog() = {
