@@ -36,22 +36,9 @@ class RoomListClientActor extends Actor {
     val server: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
     serverOpt = Option(server)
 
-    MainApp.system.eventStream.subscribe(context.self, classOf[DeadLetter])
-
   }
 
   def receive = {
-    case d: DeadLetter => {
-      Platform.runLater {
-        val alert = new Alert(AlertType.Error){
-          initOwner(MainApp.stage)
-          title       = "Lost Connection to room server"
-          headerText  = "Cannot Communicate with server"
-          contentText = "Please check ip address and port in settings!"
-        }.showAndWait()	
-        MainApp.goToMainPage()
-      }
-    }
     /*********Call from controller************************/
     case "getRoomList" =>
         for (server <- serverOpt){
@@ -76,58 +63,85 @@ class RoomListClientActor extends Actor {
 
     case Join(roomNo,name) =>
       for (server <- serverOpt){
-        var result = server ? RoomListServerActor.Join(roomNo,name)
+        
+        if(checkConnection(server)){
+          var result = server ? RoomListServerActor.Join(roomNo,name)
 
-        result.foreach(x => {
-          x match {
-              case hostActor: ActorRef =>
-                Platform.runLater{
-                  MainApp.goToRoomDetailPage(roomNo,false,name,hostActor)
-                  MainApp.system.stop(context.self)
-                }
-              case error:String =>
-                Platform.runLater {
-                  val alert = new Alert(AlertType.Error){
-                    initOwner(MainApp.stage)
-                    title       = "Error Join Room"
-                    headerText  = "Error:"
-                    contentText = error
-                  }.showAndWait()	
-                }
-              case _ => 
+          result.foreach(x => {
+            x match {
+                case hostActor: ActorRef =>
+                  Platform.runLater{
+                    MainApp.goToRoomDetailPage(roomNo,false,name,hostActor)
+                    MainApp.system.stop(context.self)
+                  }
+                case error:String =>
+                  Platform.runLater {
+                    val alert = new Alert(AlertType.Error){
+                      initOwner(MainApp.stage)
+                      title       = "Error Join Room"
+                      headerText  = "Error:"
+                      contentText = error
+                    }.showAndWait()	
+                  }
+                case _ => 
+            }
+          })
+        }else{
+          Platform.runLater{
+            val alert = new Alert(AlertType.Error){
+              initOwner(MainApp.stage)
+              title       = "Lost Connection to Server"
+              headerText  = "Cannot connect to server"
+              contentText = "Please check ip address and port in settings!"
+            }.showAndWait()	
+            MainApp.goToMainPage()
           }
-        })
+        }
 
 
       }
 
     case CreateRoom(name) =>
+      println(serverOpt)
       for (server <- serverOpt){
-        //since user create room he will be responsible as a server
-        val roomServer:ActorRef = MainApp.system.actorOf(Props(new ds.server.RoomPageServerActor(name)), "roompageserver"+randomUUID().toString)
-        
-        var result = server ? RoomListServerActor.CreateRoom(name,roomServer)
+        if(checkConnection(server)==true){
+           //since user create room he will be responsible as a server
+          val roomServer:ActorRef = MainApp.system.actorOf(Props(new ds.server.RoomPageServerActor(name)), "roompageserver"+randomUUID().toString)
+          
+          var result = server ? RoomListServerActor.CreateRoom(name,roomServer)
 
-        result.foreach(x => {
-          x match {
-              case RoomListServerActor.SuccessCreateRoom(roomNo) =>
-                Platform.runLater{
-                  roomServer ! RoomPageServerActor.SetRoomNo(roomNo)
-                  MainApp.goToRoomDetailPage(roomNo,true,name,roomServer)
-                  MainApp.system.stop(context.self)
-                }
-              case error:String =>
-                Platform.runLater {
-                  val alert = new Alert(AlertType.Error){
-                    initOwner(MainApp.stage)
-                    title       = "Error Create Room"
-                    headerText  = "Error"
-                    contentText = error.asInstanceOf[String]
-                  }.showAndWait()	
-                }
-              case _ => 
+          result.foreach(x => {
+            x match {
+                case RoomListServerActor.SuccessCreateRoom(roomNo) =>
+                  Platform.runLater{
+                    roomServer ! RoomPageServerActor.SetRoomNo(roomNo)
+                    MainApp.goToRoomDetailPage(roomNo,true,name,roomServer)
+                    MainApp.system.stop(context.self)
+                  }
+                case error:String =>
+                  Platform.runLater {
+                    val alert = new Alert(AlertType.Error){
+                      initOwner(MainApp.stage)
+                      title       = "Error Create Room"
+                      headerText  = "Error"
+                      contentText = error.asInstanceOf[String]
+                    }.showAndWait()	
+                  }
+                case _ => 
+            }
+          })
+        }else{
+          Platform.runLater{
+            val alert = new Alert(AlertType.Error){
+              initOwner(MainApp.stage)
+              title       = "Lost Connection to Server"
+              headerText  = "Cannot connect to server"
+              contentText = "Please check ip address and port in settings!"
+            }.showAndWait()	
+            MainApp.goToMainPage()
           }
-        })
+        }
+       
       }
 
 
@@ -154,6 +168,21 @@ class RoomListClientActor extends Actor {
       }
       
     case _=>
+  }
+
+  def checkConnection(serverConnection:ActorSelection):Boolean = {
+    var canConnect:Boolean = false
+    try{
+      //test connection
+      //actorselection will throw error if cant connect after 2 second
+      val server = Await.result(MainApp.system.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver").resolveOne(1 second),1 seconds)
+      canConnect = true
+      
+    }catch{
+      case e:Throwable =>
+        canConnect=false
+    }	
+    return canConnect
   }
 }
 

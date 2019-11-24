@@ -185,7 +185,11 @@ class RoomPageServerActor(val hostName:String) extends Actor {
             }
         }
         
-        if(isAllReady == true){
+        if(isAllReady == false){
+            sender ! playerNotReady+" are not Ready."
+        }else if(playerListInRoom.size <=1){
+            sender ! "There must be at least 2 player to start game."
+        }else{
             //remove the room cause already start game
             val roomListserver: ActorSelection = context.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver")
             roomListserver ! RoomListServerActor.RemoveRoom(roomNo)
@@ -196,13 +200,11 @@ class RoomPageServerActor(val hostName:String) extends Actor {
                 clientActorRef ! ServerAskStartGame(gamePageServerActorRef,clientName)
             }
 
-            //wait 2 second and start the game
-            Thread.sleep(2000)
+            //wait 1 second and start the game
+            Thread.sleep(1000)
             gamePageServerActorRef ! "startGame"
             sender ! "ok"
             MainApp.system.stop(context.self)
-        }else{
-            sender ! playerNotReady+" are not Ready."
         }
 
         

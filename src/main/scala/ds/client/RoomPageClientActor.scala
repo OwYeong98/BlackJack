@@ -66,7 +66,7 @@ class RoomPageClientActor(var hostServerActorRef:ActorRef) extends Actor {
                   val alert = new Alert(AlertType.Error){
                     initOwner(MainApp.stage)
                     title       = "Error Start Game"
-                    headerText  = "Someone Not Ready"
+                    headerText  = "Some error Occured"
                     contentText = error.asInstanceOf[String]
                   }.showAndWait()	
                 }

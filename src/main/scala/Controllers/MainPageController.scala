@@ -61,7 +61,7 @@ class MainPageController(
 		try{
 			//test connection
 			//actorselection will throw error if cant connect after 2 second
-			val server = Await.result(MainApp.system.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver").resolveOne(2 second),2 seconds)
+			val server = Await.result(MainApp.system.actorSelection(s"akka.tcp://blackjack@${MainApp.ipAddress}:${MainApp.port.toString}/user/roomlistserver").resolveOne(1 second),1 seconds)
 			
 			//if can go here means connection success can go roomlistpage
 			MainApp.goToRoomListPage()
