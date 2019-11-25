@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import Models.Room
 
 import scala.concurrent.ExecutionContext.Implicits._
-import ds.client.GamePageClientActor.{InitialConnectionWithServer, ReceiveInitialCards, ReceivePlayerList,PlayerTurn, Draw, CardDrawn, DeclareWinner}
+import ds.client.GamePageClientActor.{InitialConnectionWithServer, ReceiveInitialCards, ReceivePlayerList,PlayerTurn, Draw, CardDrawn, DeclareWinner, PlayerDisconnected}
 import ds.server.GamePageServerActor
 
 class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
@@ -34,6 +34,12 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
 
   def receive = {
 
+    case PlayerDisconnected(playerlist, playercards) => {
+      Platform.runLater{
+        MainApp.gamePageControllerRef.initializePlayer(playerlist)
+        MainApp.gamePageControllerRef.initializeCard(playercards)
+      }
+    }
     
     /*********Call from controller************************/
     case InitialConnectionWithServer(name) =>
@@ -131,6 +137,7 @@ object GamePageClientActor {
   final case class Draw(name: String)
   final case class CardDrawn(name: String, cards: String)
   final case class DeclareWinner(winnerLists: ArrayBuffer[String], winnerCards: Map[String,ArrayBuffer[Tuple3[String,Integer,String]]])
+  final case class PlayerDisconnected(updatedPlayers: ArrayBuffer[String], updatedCards: Map[String,ArrayBuffer[Tuple3[String,Integer,String]]])
 
 
 

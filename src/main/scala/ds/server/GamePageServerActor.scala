@@ -39,9 +39,20 @@ class GamePageServerActor extends Actor {
     case Terminated(actorRef) =>{
       for((name, clientRef) <- playerListInRoom){
         if(clientRef == actorRef){
-            playerListInRoom.remove(name)
-            players -= (players.find(_.playerName==name).get)
-            playerName -= name
+          playerListInRoom.remove(name)
+          players -= (players.find(_.playerName==name).get)
+          playerName -= name
+          
+          var playerCards = Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]()
+          //Mapping existing cards to corresponding players to send them over
+          for(player <- players){
+            //make map ("Player1"->CardList)
+            playerCards+=(player.playerName -> player.handCard)
+          }
+          //Reinitializing Player UI with their own cards
+          for((name,clientRef) <- playerListInRoom){
+            clientRef ! GamePageClientActor.PlayerDisconnected(playerName,playerCards)
+          }
         }
       }
     }
@@ -158,11 +169,22 @@ class GamePageServerActor extends Actor {
     case Terminated(actorRef) =>{
       for((name, clientRef) <- playerListInRoom){
         if(clientRef == actorRef){
-            playerListInRoom.remove(name)
-            players -= (players.find(_.playerName==name).get)
-            playerName -= name
-            context.become(receive)
-            context.self ! "Initialized"
+          playerListInRoom.remove(name)
+          players -= (players.find(_.playerName==name).get)
+          playerName -= name
+          context.become(receive)
+          context.self ! "Initialized"
+
+          var playerCards = Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]()
+          //Mapping existing cards to corresponding players to send them over
+          for(player <- players){
+            //make map ("Player1"->CardList)
+            playerCards+=(player.playerName -> player.handCard)
+          }
+          //Reinitializing Player UI with their own cards
+          for((name,clientRef) <- playerListInRoom){
+            clientRef ! GamePageClientActor.PlayerDisconnected(playerName,playerCards)
+          }
         }
       }
     }
