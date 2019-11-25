@@ -36,6 +36,8 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
 
     case PlayerDisconnected(playerlist, playercards) => {
       Platform.runLater{
+        println("My Player List: "+playerlist)
+        println("My Player List: "+playercards)
         MainApp.gamePageControllerRef.initializePlayer(playerlist)
         MainApp.gamePageControllerRef.initializeCard(playercards)
       }

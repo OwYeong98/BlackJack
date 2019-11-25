@@ -309,6 +309,20 @@ class GamePageController(
 	}
 
 	def initializePlayer(playerList: ArrayBuffer[String] ) = {
+		playerTurnSequence.clear();
+		for(x <- playerNameLabelList){
+			x.text = ""
+		}
+		for(x <- playerVBoxList){
+			x.visible = false
+		}
+		for(x <- 0 to playerLists.length -1){
+			playerLists(x) = null
+		}
+		for(x <- cardListFlowPanes){
+			x.getChildren().clear()
+		}
+
 		playerTurnSequence++=playerList
 		var clockwiseSequence = ListBuffer[Int]()
 		clockwiseSequence += (0,6,2,4,1,5,3,7)
