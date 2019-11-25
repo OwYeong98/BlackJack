@@ -3,7 +3,7 @@ package ds.client
 import MainSystem.MainApp
 import scalafx.scene.control._
 import scalafx.scene.input._
-import akka.actor.{Actor, ActorRef, ActorSelection, Props}
+import akka.actor.{Actor, ActorRef, ActorSelection, Props, Terminated}
 import scalafx.collections.ObservableHashSet
 import akka.pattern.ask
 import akka.remote.DisassociatedEvent
@@ -28,7 +28,7 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   //example hostServerActorRef ! "haha"
 
   override def preStart(): Unit = {
- 
+    context.watch(hostServerActorRef)
 
   }
 

@@ -1,6 +1,6 @@
 package ds.server
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Terminated}
 import scalafx.collections.ObservableHashSet
 import akka.pattern.ask
 import akka.remote.DisassociatedEvent
@@ -36,6 +36,16 @@ class GamePageServerActor extends Actor {
   }
 
   def receive = {
+    case Terminated(actorRef) =>{
+      for((name, clientRef) <- playerListInRoom){
+        if(clientRef == actorRef){
+            playerListInRoom.remove(name)
+            players -= (players.find(_.playerName==name).get)
+            playerName -= name
+        }
+      }
+    }
+        
     //this startGame will be called when all player successfully connected
     case "startGame" =>
         //this will be called when the player press startgame in roomdetailpage  
@@ -82,6 +92,7 @@ class GamePageServerActor extends Actor {
         //add player ref into the room
         playerListInRoom += (name -> clientRef)
         println(name+" Joined")
+        context.watch(clientRef)
 
 
     case "Initialized" => {
@@ -142,6 +153,18 @@ class GamePageServerActor extends Actor {
       context.self ! "Initialized"
       println("Server turn end")
       playerName.remove(0)
+    }
+
+    case Terminated(actorRef) =>{
+      for((name, clientRef) <- playerListInRoom){
+        if(clientRef == actorRef){
+            playerListInRoom.remove(name)
+            players -= (players.find(_.playerName==name).get)
+            playerName -= name
+            context.become(receive)
+            context.self ! "Initialized"
+        }
+      }
     }
 
     case _=>
