@@ -97,6 +97,15 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   }
 
   def myTurn: Receive = {
+    case PlayerDisconnected(playerlist, playercards) => {
+      Platform.runLater{
+        println("My Player List: "+playerlist)
+        println("My Player List: "+playercards)
+        MainApp.gamePageControllerRef.initializePlayer(playerlist)
+        MainApp.gamePageControllerRef.initializeCard(playercards)
+      }
+    }
+    
     case Draw(name) => {
       hostServerActorRef ! GamePageServerActor.Draw(name)
     }

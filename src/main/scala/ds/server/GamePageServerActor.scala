@@ -151,11 +151,15 @@ class GamePageServerActor extends Actor {
 
   def DrawingStage: Receive = {
     case Draw(pname) => {
-      val cardDrawn = deck.draw()
-      (players.find(_.playerName==pname).get).assignHandCard(cardDrawn)
-      for((name,clientRef) <- playerListInRoom){
-        var cardString: String = cardDrawn._3+"_"+cardDrawn._1
-        clientRef ! GamePageClientActor.CardDrawn(pname, cardString)
+      if((players.find(_.playerName==pname).get).handCard.size < 5){
+        val cardDrawn = deck.draw()
+        (players.find(_.playerName==pname).get).assignHandCard(cardDrawn)
+
+        for((name,clientRef) <- playerListInRoom){
+          var cardString: String = cardDrawn._3+"_"+cardDrawn._1
+          clientRef ! GamePageClientActor.CardDrawn(pname, cardString)
+        }
+
       }
     }
 
@@ -181,9 +185,14 @@ class GamePageServerActor extends Actor {
             //make map ("Player1"->CardList)
             playerCards+=(player.playerName -> player.handCard)
           }
+          
+          var playersAlive = ArrayBuffer[String]()
+          for(player <- players){
+            playersAlive += player.playerName
+          }
           //Reinitializing Player UI with their own cards
           for((name,clientRef) <- playerListInRoom){
-            clientRef ! GamePageClientActor.PlayerDisconnected(playerName,playerCards)
+            clientRef ! GamePageClientActor.PlayerDisconnected(playersAlive,playerCards)
           }
         }
       }

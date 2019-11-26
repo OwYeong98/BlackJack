@@ -103,16 +103,21 @@ object BlackJack{
     var worth = 0
     val value = p.getHandValue()
 
-    value match {
-      case a if ( value == 16 ) => { worth = 1 }
-      case b if ( value == 17 ) => { worth = 2 }
-      case c if ( value == 18 ) => { worth = 3 }
-      case d if ( value == 19 ) => { worth = 4 }
-      case e if ( value == 20 ) => { worth = 5 }
-      case f if ( value == 21 ) => { if (p.handCard.size == 2){
-        worth = 7
-      }else { worth = 6 }}
-      case _ => worth = 0
+    if(p.handCard.size == 5 && p.getHandValue() < 22){
+      worth = 7
+    }
+    else {
+      value match {
+        case a if ( value == 16 ) => { worth = 1 }
+        case b if ( value == 17 ) => { worth = 2 }
+        case c if ( value == 18 ) => { worth = 3 }
+        case d if ( value == 19 ) => { worth = 4 }
+        case e if ( value == 20 ) => { worth = 5 }
+        case f if ( value == 21 ) => { if (p.handCard.size == 2){
+          worth = 8
+        }else { worth = 6 }}
+        case _ => worth = 0
+      }
     }
 
     p.assignHandWorth(worth)
