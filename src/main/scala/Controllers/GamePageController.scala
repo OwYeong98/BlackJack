@@ -308,6 +308,15 @@ class GamePageController(
 		}	
 	}
 
+	def removePlayer(name:String) ={
+		playerTurnSequence -= name
+		var index:Int = playerLists.indexOf(name)
+		playerNameLabelList(index).text = ""
+		playerVBoxList(index).visible = false
+		cardListFlowPanes(index).getChildren().clear()
+		playerLists.update(index,null)
+	}
+
 	def initializePlayer(playerList: ArrayBuffer[String] ) = {
 		playerTurnSequence.clear();
 		for(x <- playerNameLabelList){
