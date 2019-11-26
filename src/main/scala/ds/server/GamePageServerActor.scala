@@ -39,19 +39,16 @@ class GamePageServerActor extends Actor {
     case Terminated(actorRef) =>{
       for((name, clientRef) <- playerListInRoom){
         if(clientRef == actorRef){
-          playerListInRoom.remove(name)
-          players -= (players.find(_.playerName==name).get)
-          playerName -= name
-          
-          var playerCards = Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]()
-          //Mapping existing cards to corresponding players to send them over
-          for(player <- players){
-            //make map ("Player1"->CardList)
-            playerCards+=(player.playerName -> player.handCard)
-          }
+          var disconnectedPlayer = name
+          playerListInRoom.remove(disconnectedPlayer)
+          players -= (players.find(_.playerName==disconnectedPlayer).get)
+          playerName -= disconnectedPlayer
+          context.become(receive)
+          context.self ! "Initialized"
+
           //Reinitializing Player UI with their own cards
           for((name,clientRef) <- playerListInRoom){
-            clientRef ! GamePageClientActor.PlayerDisconnected(playerName,playerCards)
+            clientRef ! GamePageClientActor.PlayerDisconnected(disconnectedPlayer)
           }
         }
       }
@@ -132,9 +129,9 @@ class GamePageServerActor extends Actor {
         winners = BlackJack.determineWinner(players)
         var playerCards = Map[String,ArrayBuffer[Tuple3[String,Integer,String]]]()
         for(player <- players){
-        //make map ("Player1"->CardList)
-        playerCards+=(player.playerName -> player.handCard)
-      }
+          //make map ("Player1"->CardList)
+          playerCards+=(player.playerName -> player.handCard)
+        }
 
         for((name,clientRef) <- playerListInRoom){
             clientRef ! GamePageClientActor.DeclareWinner(winners,playerCards)
@@ -173,6 +170,24 @@ class GamePageServerActor extends Actor {
     case Terminated(actorRef) =>{
       for((name, clientRef) <- playerListInRoom){
         if(clientRef == actorRef){
+          var disconnectedPlayer = name
+          playerListInRoom.remove(disconnectedPlayer)
+          players -= (players.find(_.playerName==disconnectedPlayer).get)
+          playerName -= disconnectedPlayer
+          context.become(receive)
+          context.self ! "Initialized"
+
+          //Reinitializing Player UI with their own cards
+          for((name,clientRef) <- playerListInRoom){
+            clientRef ! GamePageClientActor.PlayerDisconnected(disconnectedPlayer)
+          }
+        }
+      }
+    }
+/*
+    case Terminated(actorRef) =>{
+      for((name, clientRef) <- playerListInRoom){
+        if(clientRef == actorRef){
           playerListInRoom.remove(name)
           players -= (players.find(_.playerName==name).get)
           playerName -= name
@@ -197,6 +212,7 @@ class GamePageServerActor extends Actor {
         }
       }
     }
+*/
 
     case _=>
   }

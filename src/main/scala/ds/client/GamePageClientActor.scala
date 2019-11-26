@@ -34,12 +34,9 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
 
   def receive = {
 
-    case PlayerDisconnected(playerlist, playercards) => {
+    case PlayerDisconnected(disconnectedPlayer) => {
       Platform.runLater{
-        println("My Player List: "+playerlist)
-        println("My Player List: "+playercards)
-        MainApp.gamePageControllerRef.initializePlayer(playerlist)
-        MainApp.gamePageControllerRef.initializeCard(playercards)
+        MainApp.gamePageControllerRef.removePlayer(disconnectedPlayer)
       }
     }
     
@@ -97,6 +94,12 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   }
 
   def myTurn: Receive = {
+    case PlayerDisconnected(disconnectedPlayer) => {
+      Platform.runLater{
+        MainApp.gamePageControllerRef.removePlayer(disconnectedPlayer)
+      }
+    }
+    /*
     case PlayerDisconnected(playerlist, playercards) => {
       Platform.runLater{
         println("My Player List: "+playerlist)
@@ -105,7 +108,7 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
         MainApp.gamePageControllerRef.initializeCard(playercards)
       }
     }
-    
+    */
     case Draw(name) => {
       hostServerActorRef ! GamePageServerActor.Draw(name)
     }
@@ -130,6 +133,11 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   }
 
   def DeclareWinnerStage: Receive = {
+    case PlayerDisconnected(disconnectedPlayer) => {
+      Platform.runLater{
+        MainApp.gamePageControllerRef.removePlayer(disconnectedPlayer)
+      }
+    }
     case DeclareWinner(winnerlists, winnercards) => {
       Platform.runLater{
         MainApp.gamePageControllerRef.showResult(winnerlists, winnercards)
@@ -148,7 +156,8 @@ object GamePageClientActor {
   final case class Draw(name: String)
   final case class CardDrawn(name: String, cards: String)
   final case class DeclareWinner(winnerLists: ArrayBuffer[String], winnerCards: Map[String,ArrayBuffer[Tuple3[String,Integer,String]]])
-  final case class PlayerDisconnected(updatedPlayers: ArrayBuffer[String], updatedCards: Map[String,ArrayBuffer[Tuple3[String,Integer,String]]])
+  final case class PlayerDisconnected(name: String)
+  //final case class PlayerDisconnected(updatedPlayers: ArrayBuffer[String], updatedCards: Map[String,ArrayBuffer[Tuple3[String,Integer,String]]])
 
 
 
