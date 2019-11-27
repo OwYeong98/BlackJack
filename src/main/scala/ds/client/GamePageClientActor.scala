@@ -33,6 +33,17 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   }
 
   def receive = {
+    case Terminated(actorRef) => {
+      Platform.runLater{
+        val alert = new Alert(AlertType.Error){
+                    initOwner(MainApp.stage)
+                    title = "Lost connection to Server"
+                    headerText = "Server Connection Lost"
+                    contentText = "Connection to Host lost!"
+                    }.showAndWait()
+        MainApp.goToMainPage()
+      }
+    }
 
     case PlayerDisconnected(disconnectedPlayer) => {
       Platform.runLater{
@@ -94,6 +105,18 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   }
 
   def myTurn: Receive = {
+    case Terminated(actorRef) => {
+      Platform.runLater{
+        val alert = new Alert(AlertType.Error){
+                    initOwner(MainApp.stage)
+                    title = "Lost connection to Server"
+                    headerText = "Server Connection Lost"
+                    contentText = "Connection to Host lost!"
+                    }.showAndWait()
+        MainApp.goToMainPage()
+      }
+    }
+
     case PlayerDisconnected(disconnectedPlayer) => {
       Platform.runLater{
         MainApp.gamePageControllerRef.removePlayer(disconnectedPlayer)
@@ -133,6 +156,18 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
   }
 
   def DeclareWinnerStage: Receive = {
+    case Terminated(actorRef) => {
+      Platform.runLater{
+        val alert = new Alert(AlertType.Error){
+                    initOwner(MainApp.stage)
+                    title = "Lost connection to Server"
+                    headerText = "Server Connection Lost"
+                    contentText = "Connection to Host lost!"
+                    }.showAndWait()
+        MainApp.goToMainPage()
+      }
+    }
+    
     case PlayerDisconnected(disconnectedPlayer) => {
       Platform.runLater{
         MainApp.gamePageControllerRef.removePlayer(disconnectedPlayer)
