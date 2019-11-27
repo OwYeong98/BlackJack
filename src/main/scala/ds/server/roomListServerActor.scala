@@ -97,7 +97,7 @@ class RoomListServerActor extends Actor {
 
       if(roomRef == null){
         sender ! "Room Not Found!"
-      }else if(roomRef.playerList.length>= 8){
+      }else if(roomRef.playerList.length> 8){
         sender ! "Room is Full!"
       }else if(roomRef.playerList.exists(x=> x.toLowerCase().equals(name.toLowerCase()))){
         sender ! s"SomeOne already used the Name '$name'"

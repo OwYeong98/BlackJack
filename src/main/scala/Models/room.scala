@@ -8,7 +8,7 @@ class Room(private var _roomNo: Int, private var _hostName: String,private var _
 	//property are for table use
 	var roomNoProperty = ObjectProperty[Int](roomNo)
 	var hostNameProperty = new StringProperty(hostName)
-	var noOfPlayerProperty = new StringProperty(noOfPlayer+" / 7")
+	var noOfPlayerProperty = new StringProperty(noOfPlayer+" / 8")
 
 
 	//getter
@@ -27,7 +27,7 @@ class Room(private var _roomNo: Int, private var _hostName: String,private var _
 	}
 	def noOfPlayer_=(newValue: Int){
 		_noOfPlayer=newValue
-		noOfPlayerProperty.value = newValue+" / 7"
+		noOfPlayerProperty.value = newValue+" / 8"
 	}
 
 
