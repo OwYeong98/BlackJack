@@ -1,5 +1,6 @@
 package ds.server
 
+import MainSystem.MainApp
 import akka.actor.{Actor, ActorRef, Terminated}
 import scalafx.collections.ObservableHashSet
 import akka.pattern.ask
@@ -136,6 +137,7 @@ class GamePageServerActor extends Actor {
         for((name,clientRef) <- playerListInRoom){
             clientRef ! GamePageClientActor.DeclareWinner(winners,playerCards)
         }
+        MainApp.system.stop(context.self)
       }
     }
 

@@ -43,6 +43,7 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
                     }.showAndWait()
         MainApp.goToMainPage()
       }
+      MainApp.system.stop(context.self)
     }
 
     case PlayerDisconnected(disconnectedPlayer) => {
@@ -177,6 +178,7 @@ class GamePageClientActor(var hostServerActorRef:ActorRef) extends Actor {
       Platform.runLater{
         MainApp.gamePageControllerRef.showResult(winnerlists, winnercards)
       }
+      MainApp.system.stop(context.self)
     }
 
     case _=>
